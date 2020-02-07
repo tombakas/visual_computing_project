@@ -1,0 +1,18 @@
+@import "reset";
+@import "variables";
+
+
+#app {
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+
+  color: $terrible-fg;
+  background-color: $terrible-bg;
+
+  h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    align-self: center;
+  }
+}
