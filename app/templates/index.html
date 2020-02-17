@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title></title>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.7.0/mapbox-gl.css' rel='stylesheet' />
 
     {% assets "css" %}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
@@ -20,7 +22,9 @@
     -->
     {% raw %}
     <div id="app">
-      <h1>{{ message }}</h1>
+      <navigation-bar>  
+      </navigation-bar>
+      <base-map></base-map>
     </div>
     {% endraw %}
 
