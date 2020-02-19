@@ -11,6 +11,20 @@ def remove_extra_spaces(text):
     return re.sub("[\xa0\s]+", " ", text)  # noqa: N605
 
 
+def establish_service(short_name):
+    services = {
+        "CM": "police",
+        "CP": "ambulance",
+        "CE": "fire-brigade",
+        "CH": "helicopter"
+    }
+
+    if short_name in services:
+        return services[short_name]
+    else:
+        return "unknown"
+
+
 def parse_entries(entries, logger:logging.Logger):
     json_entry_list = []
     for entry in entries:
@@ -31,8 +45,10 @@ def parse_entries(entries, logger:logging.Logger):
                     n_parts = tds[3].find("a")
                     if n_parts is not None:
                         data["link"] = BASE_URL + "/" + n_parts["href"]
+                        data["service"] = establish_service(n_parts["class"][0])
                     else:
                         n_parts = tds[3].find("span")
+                        data["service"] = "unknown"
 
                     data["notification"] = remove_extra_spaces(
                         ";".join(
@@ -87,7 +103,7 @@ def get_logger():
         filemode='a',
         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
         datefmt='%H:%M:%S',
-        level=logging.DEBUG
+        level=logging.INFO
     )
 
     logger = logging.getLogger("112meldingen_crawler")

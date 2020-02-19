@@ -20,7 +20,10 @@ class SessionController:
         self.session = requests.Session()
 
     def get_html(self):
-        ret = self.session.get(ALRT_URL, headers=HEADERS)
+        try:
+            ret = self.session.get(ALRT_URL, headers=HEADERS)
+        except requests.exceptions.ConnectionError:
+            return None
         return ret.text
 
     def modify_settings(self, settings):
@@ -51,4 +54,4 @@ class SessionController:
         try:
             return self.modify_settings({"submitFormNextAlerts": "vroeger+>>>"})
         except requests.exceptions.ConnectionError:
-            return False
+            return None

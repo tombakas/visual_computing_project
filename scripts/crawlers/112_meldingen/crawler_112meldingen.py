@@ -36,19 +36,11 @@ def run(verbose=False, date_settings=None):
     sc.get_entries()
     logger = setup(verbose)
 
-    if not all([
-        sc.setup_regions(REGIONS),
-        sc.modify_settings(SERVICE_SETTINGS)
-    ]):
-        logger.error("Can't configure settings")
-        stop = True
-        error = True
+    sc.setup_regions(REGIONS),
+    sc.modify_settings(SERVICE_SETTINGS)
 
     if date_settings:
-        if not sc.modify_settings(date_settings):
-            logger.error("Can't configure settings")
-            stop = True
-            error = True
+        sc.modify_settings(date_settings)
 
     try:
         batch_nr = 1
@@ -59,7 +51,19 @@ def run(verbose=False, date_settings=None):
 
             logger.info("Processing batch {}".format(batch_nr))
 
-            entries = sc.get_entries()
+            for i in range(1, 11):
+                entries = sc.get_entries()
+                if entries is not None:
+                    break
+                else:
+                    logger.error(
+                        "Getting entries failed {} times. "
+                        "Waiting 1s and trying again...".format(i)
+                    )
+                    time.sleep(1)
+
+                    if i == 10:
+                        stop = True
 
             if len(entries) == 0:
                 logger.error("No data")
@@ -77,7 +81,7 @@ def run(verbose=False, date_settings=None):
                 save_batch(batch_nr, data, TARGET_DIR, stop)
             batch_nr += 1
 
-            for i in range(10):
+            for i in range(1, 11):
                 if sc.next():
                     break
 
@@ -86,7 +90,7 @@ def run(verbose=False, date_settings=None):
                 )
                 time.sleep(1)
 
-                if i == 9:
+                if i == 10:
                     stop = True
 
     except KeyboardInterrupt:
