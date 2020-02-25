@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import BaseMap from './components/Map';
 import Navigation from './components/Navbar';
 
@@ -19,5 +18,5 @@ export default {
 </script>
 
 <style lang="scss">
-
+@import './scss/app.scss';
 </style>
