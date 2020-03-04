@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os
 import json
 import sqlite3
@@ -83,7 +83,7 @@ def make_date_time(call):
 
 def make_call_hash(call):
     return md5(
-        call["date"] + call["time"] + call["notification"]
+        bytes(call["date"] + call["time"] + call["notification"], "utf-8")
     ).hexdigest()
 
 
