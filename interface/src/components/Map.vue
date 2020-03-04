@@ -1,23 +1,92 @@
 <template>
-  <div id="map" style="width: 100%; height: 100%;"></div>
+  <div style="width: 100%; height: 100%;">
+    <MglMap :accessToken="accessToken" :mapStyle="mapStyle" :center="center" :zoom="zoom">
+      <MglGeojsonLayer
+        :sourceId="calls.data.id"
+        :source="calls"
+        layerId="Test"
+        :layer="geoJsonLayer"
+      />
+    </MglMap>
+  </div>
 </template>
 
 <script>
+import Mapbox from "mapbox-gl";
+import { MglMap, MglGeojsonLayer } from "vue-mapbox";
+
 export default {
+  components: {
+    MglMap,
+    MglGeojsonLayer
+  },
+  computed: {
+    calls() {
+      return this.$store.getters.getCalls;
+    }
+  },
   data() {
     return {
-      map: null
+      accessToken:
+        "pk.eyJ1IjoiY2h1cnJvcyIsImEiOiJjazZxdHlkNWQwMGViM21wZHMzMWRxazBvIn0.tdWPYNbC-n38mpRA23WFyQ",
+      mapStyle: "mapbox://styles/mapbox/streets-v11",
+      center: [5.4697, 51.4416],
+      zoom: 11.5,
+      geoJsonLayer: {
+        type: "heatmap",
+        paint: {
+          // Increase the heatmap weight based on frequency and property magnitude
+          "heatmap-weight": [
+            "interpolate",
+            ["linear"],
+            ["get", "mag"],
+            0,
+            0,
+            6,
+            1
+          ],
+          // Increase the heatmap color weight weight by zoom level
+          // heatmap-intensity is a multiplier on top of heatmap-weight
+          "heatmap-intensity": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            0,
+            1,
+            9,
+            3
+          ],
+          // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
+          // Begin color ramp at 0-stop with a 0-transparancy color
+          // to create a blur-like effect.
+          "heatmap-color": [
+            "interpolate",
+            ["linear"],
+            ["heatmap-density"],
+            0,
+            "rgba(33,102,172,0)",
+            0.2,
+            "rgb(103,169,207)",
+            0.4,
+            "rgb(209,229,240)",
+            0.6,
+            "rgb(253,219,199)",
+            0.8,
+            "rgb(239,138,98)",
+            1,
+            "rgb(178,24,43)"
+          ],
+          // Adjust the heatmap radius by zoom level
+          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 9, 20],
+          // Transition from heatmap to circle layer by zoom level
+          "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 7, 1, 9, 0]
+        }
+      }
     };
   },
-  mounted() {
-    mapboxgl.accessToken =
-      "pk.eyJ1IjoiY2h1cnJvcyIsImEiOiJjazZxdHlkNWQwMGViM21wZHMzMWRxazBvIn0.tdWPYNbC-n38mpRA23WFyQ";
-    let map = new mapboxgl.Map({
-      container: "map",
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [5.4697, 51.4416],
-      zoom: 11.5
-    });
+  created() {
+    this.mapbox = Mapbox;
+    console.log(this.test);
   }
 };
 </script>
