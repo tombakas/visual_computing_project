@@ -77,16 +77,15 @@ export default {
             "rgb(178,24,43)"
           ],
           // Adjust the heatmap radius by zoom level
-          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 9, 20],
+          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 9, 10],
           // Transition from heatmap to circle layer by zoom level
-          "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 7, 1, 9, 0]
+          "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 11, 1, 19, 3]
         }
       }
     };
   },
   created() {
     this.mapbox = Mapbox;
-    console.log(this.test);
   }
 };
 </script>

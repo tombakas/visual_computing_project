@@ -12,6 +12,7 @@
  - Cd into the interface folder
  - Run `npm install` or `yarn install`, depending on preference and installed package manager, to install all dependencies
  - Compile production using `npm run-script build` or `yarn build`
+ - Per made change, the build command needs to be run in order to be visible
 
 # API usage
 To use the api, make sure to put the latest version of the database into the **db** 
