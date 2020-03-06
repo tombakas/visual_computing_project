@@ -1,9 +1,10 @@
 nav {
     background-color: map-get($map: $colors, $key: 'black');
     color: map-get($map: $colors, $key: 'white');
-    width: 20%;
+    width: calc(20% - 40px);
     height: 100%;
     left: 0;
     overflow-y: auto;
     padding: 10px 20px;
+    flex-shrink: 0;
 }

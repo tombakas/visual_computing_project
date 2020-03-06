@@ -8,6 +8,10 @@
  - Run the app with `flask run`
  - It's available at `localhost:5000` by default and should reload on code update
 
+ # Compile frontend
+ - Cd into the interface folder
+ - Run `npm install` or `yarn install`, depending on preference and installed package manager, to install all dependencies
+ - Compile production using `npm run-script build` or `yarn build`
 
 # API usage
 To use the api, make sure to put the latest version of the database into the **db** 
