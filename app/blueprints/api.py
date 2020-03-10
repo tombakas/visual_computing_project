@@ -26,15 +26,15 @@ def calls_query_builder(params={}, limit=False):
 
     service = params.get("service")
     if service:
-        conditions.append(f"service='{service}'")
+        conditions.append("service='{}'".format(service))
 
     from_date = params.get("from")
     if from_date:
-        conditions.append(f"datetime>='{from_date}'")
+        conditions.append("datetime>='{}'".format(from_date))
 
     to_date = params.get("to")
     if to_date:
-        conditions.append(f"datetime<='{to_date}'")
+        conditions.append("datetime<='{}'".format(to_date))
 
     limit = limit or params.get("limit")
     if limit:
@@ -51,7 +51,7 @@ def calls_query_builder(params={}, limit=False):
 
     """.format(
         conditions,
-        f"LIMIT {limit}" if limit else ""
+        "LIMIT {}".format(limit) if limit else ""
     )
     r = query_db(query)
     return r
