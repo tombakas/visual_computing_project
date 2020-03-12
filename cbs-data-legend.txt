@@ -1,0 +1,47 @@
+The cbs data has the following header:
+
+region: 			the name of the neighborhood
+city_name: 			name of the city	
+a_inh: 				amount of inhabitants	
+a_male: 			amount of males	
+a_female:			amount of females	
+a_00_14:			amount of people between 0-14 years	
+a_15_24:			amount of people between 15-24 years
+a_25_44: 			amount of poeple between 25-44 years	
+a_45_64:			amount of people between 45-64 years	
+a_65_oo: 			amount of poeple older than 65	
+a_w_all:			amount of western people	
+a_nw_all:			amount of non-western poeple	
+a_died:				amount of people that died	
+a_hh:				amount of households	
+av_hh_size:			average household size	
+pop_den_km2:			population density per km2	
+a_house:			amount of houses	
+av_prop_val_x1000:		average property value x1000
+per_uninhab:			percentage of houses uninhabited 	
+per_own_occ:			percentage of owner occupied houses	
+per_ren_hou:			percentage of rental houses	
+per_build_be_2000:		percentage of houses build before 2000	
+per_build_af_2000:		percentage of houses build after 2000	
+a_inc_rec:			amount of income recipiants	
+av_inc_rec_x1000:		average income per income recipiant x1000		
+av_inc_inh_x1000:		average income per inhabitant in neighborhood x1000	
+p_n_act:			percentage of active/working people between 15-75 years	
+p_hh_usm:			percentage of households under social minimium standard	
+a_bijstand:			amount of people in bijstand (social fee for people that do not work)	
+a_ao:				amount of people in ao (social fee if you can only partially or not be able to work due to injury/desease)	
+a_ww:				amount of people in ww (social fee people that worked in the past on top of the bijstand)	
+a_aow:				amount of poeple in aow (social pension fee everyone gets)	
+av_hou_theft:			average theft in houses	
+av_des_po:			average destruction of property and public misbehavior	
+av_assault:			average amount of assaults (also sexual)	
+a_comp:				amount of companies	
+a_car:				amount of cars	
+av_car_hh:			average car per household	
+av_km_doc:			average amount of km to doctor
+av_km_sup:			average amount of km to big supermarket	
+av_km_dc:			average amount of km to daycare 	
+av_km_sc:			average amount of km to school	
+a_sur_ac:			amount of surface area in acres 	
+a_lan_ac:			amount of land in acres	
+a_wat_ac:			amount of water in acres
