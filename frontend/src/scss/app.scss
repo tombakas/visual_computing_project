@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css?family=Cairo:400,600,700&display=swap");
+
+@import "reset";
+@import "variables";
+@import "navigation";
+@import "typography";
+
+html,
+body {
+  font-family: "Cairo", sans-serif;
+  color: map-get($map: $colors, $key: "black");
+  background-color: map-get($map: $colors, $key: "white");
+}
+
+#app {
+  display: flex;
+  // justify-content: space-around;
+  height: 100%;
+
+  h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    align-self: center;
+  }
+}
+
+#map {
+  position: relative;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+ }
