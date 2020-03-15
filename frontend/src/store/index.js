@@ -138,12 +138,11 @@ export default new Vuex.Store({
       };
       // commit("SET_DATA", demoGeoJson);
       axios
-        .get("api/calls/latest")
+        .get("http://localhost:5000/api/calls/latest")
         .then(result => {
           commit("SET_DATA", coordToGeoJson(result.data, "latest"));
         })
         .catch(error => {
-          console.error(error);
         });
     },
     getCalls({ commit }, params) {
@@ -152,7 +151,7 @@ export default new Vuex.Store({
         requestParams += `${param}: ${params[param]}`;
       }
       axios
-        .get("api/calls" + requestParams)
+        .get("http://localhost:5000/api/calls" + requestParams)
         .then(result => {
           commit("SET_DATA", coordToGeoJson(result.data));
         })

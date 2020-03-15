@@ -5,7 +5,7 @@ from flask import (
     request
 )
 
-from app.db import query_db
+from backend.db import query_db
 
 # A Blueprint is just a way to split a Flask app
 # into separate components to make it more organised

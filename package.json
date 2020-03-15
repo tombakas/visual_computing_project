@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@vue/cli": "^4.2.2",
-    "mapbox-gl-vue": "^2.0.4"
-  }
-}

@@ -1,9 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  assetsDir: '../static',
-  publicPath: undefined,
-  outputDir: path.resolve(__dirname, '../app/templates'),
+  assetsDir: 'assets',
+  outputDir: 'build',
   runtimeCompiler: undefined,
   productionSourceMap: undefined,
   parallel: undefined,
