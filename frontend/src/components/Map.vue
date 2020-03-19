@@ -1,24 +1,47 @@
 <template>
   <div style="width: 100%; height: 100%;">
-    <MglMap :accessToken="accessToken" :mapStyle="mapStyle" :center="center" :zoom="zoom">
-      <MglGeojsonLayer
+    <!-- <MglMap :accessToken="accessToken" :mapStyle="mapStyle" :center="center" :zoom="zoom"> -->
+      <!-- <MglGeojsonLayer
+        :sourceId="eindhovenData.data.id"
+        :source="eindhovenData"
+        layerId="tileLayer"
+        :layer="tileLayer"
+      />
+      <!-- <MglGeojsonLayer
+        :sourceId="utrechtData.data.id"
+        :source="utrechtData"
+        layerId="tileLayer"
+        :layer="tileLayer"
+      /> -->
+      <!-- <MglGeojsonLayer
         :sourceId="calls.data.id"
         :source="calls"
         layerId="Test"
         :layer="geoJsonLayer"
-      />
-    </MglMap>
+      />  --> 
+    <!-- </MglMap> -->
+    <l-map ref="map"></l-map>
   </div>
 </template>
 
 <script>
 import Mapbox from "mapbox-gl";
-import { MglMap, MglGeojsonLayer } from "vue-mapbox";
+import MapLayer from './GeoJsonlayer';
+import { MglMap, MglGeojsonLayer, MglPopUP } from "vue-mapbox";
+
+import L from 'leaflet';
+import {LMap, LTileLayer, LMarker} from 'vue2-leaflet';
+
+import eindhovenData from "../assets/EindhovenNeigh.json";
+import utrechtData from "../assets/UtrechtNeigh.json";
 
 export default {
   components: {
     MglMap,
-    MglGeojsonLayer
+    MglGeojsonLayer,
+    LMap,
+    LTileLayer,
+    LMarker
   },
   computed: {
     calls() {
@@ -27,11 +50,23 @@ export default {
   },
   data() {
     return {
+      eindhovenData: eindhovenData,
+      utrechtData: utrechtData,
       accessToken:
         "pk.eyJ1IjoiY2h1cnJvcyIsImEiOiJjazZxdHlkNWQwMGViM21wZHMzMWRxazBvIn0.tdWPYNbC-n38mpRA23WFyQ",
       mapStyle: "mapbox://styles/mapbox/streets-v11",
       center: [5.4697, 51.4416],
       zoom: 11.5,
+      tileLayer: {
+        id: "tileLayer",
+        type: "fill",
+        layout: {},
+        paint: {
+          "fill-color": "#088",
+          "fill-opacity": 0.8,
+          "fill-outline-color": "#000000"
+        }
+      },
       geoJsonLayer: {
         type: "heatmap",
         paint: {
@@ -86,6 +121,7 @@ export default {
   },
   created() {
     this.mapbox = Mapbox;
+    console.log(utrechtData)
   }
 };
 </script>

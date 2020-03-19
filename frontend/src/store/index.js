@@ -138,12 +138,11 @@ export default new Vuex.Store({
       };
       // commit("SET_DATA", demoGeoJson);
       axios
-        .get("http://localhost:5000/api/calls/latest")
+        .get("http://localhost:5000/api/calls/?limit=10000")
         .then(result => {
           commit("SET_DATA", coordToGeoJson(result.data, "latest"));
         })
-        .catch(error => {
-        });
+        .catch(error => {});
     },
     getCalls({ commit }, params) {
       let requestParams = "?";
