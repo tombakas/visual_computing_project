@@ -18,20 +18,28 @@
     <h5>Time period</h5>
     <div>
       <label for="fromDate">From</label>
-      <input type="datetime-local" name id />
+      <input type="date" v-model="timePeriod.from" v-on:change="reloadData()" />
     </div>
     <div>
       <label for="fromDate">To</label>
-      <input type="datetime-local" name id />
+      <input type="date" v-model="timePeriod.to" v-on:change="reloadData()" />
     </div>
     <h5>Number of incidents</h5>
-    <input type="range" name="limit" id="limit" min="100" max="100000" v-on:change="reloadData()" v-model="limit" step="100">
+    <input
+      type="range"
+      name="limit"
+      id="limit"
+      min="100"
+      max="100000"
+      v-on:change="reloadData()"
+      v-model="limit"
+      step="100"
+    />
     <label for="limit">{{ limit }} incidents</label>
     <h5>City</h5>
-    <select name="" id="">
+    <select name id>
       <option value="city" v-for="(city, index) in cities" :key="index">{{city}}</option>
     </select>
-    
   </nav>
 </template>
 
@@ -50,19 +58,23 @@ export default {
         { type: "crimeRates", checked: false }
       ],
       timePeriod: {
-        from: "",
-        to: ""
+        from: null,
+        to: new Date().toISOString().split("T")[0]
       },
       limit: 1000,
-      cities: ['Eindhoven', 'Utrecht']
+      cities: ["Eindhoven", "Utrecht"]
     };
   },
   methods: {
-    reloadData(){
+    reloadData() {
       let params = {
-        'limit' : this.limit,
+        limit: this.limit,
+        to: this.timePeriod.to
+      };
+      if (this.timePeriod.from !== null) {
+        params.from = this.timePeriod.from;
       }
-      this.$store.dispatch('getCalls', params);
+      this.$store.dispatch("getCalls", params);
     }
   },
   mounted() {

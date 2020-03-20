@@ -41,7 +41,7 @@ export default new Vuex.Store({
     getCalls({ commit }, params) {
       let requestParams = "?";
       for (let param in params) {
-        requestParams += `${param}=${params[param]}`;
+        requestParams += `${param}=${params[param]}&`;
       }
       axios
         .get("http://localhost:5000/api/calls/" + requestParams)
