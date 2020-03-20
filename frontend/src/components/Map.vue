@@ -1,36 +1,32 @@
 <template>
   <div style="width: 100%; height: 100%;">
-    <!-- <MglMap :accessToken="accessToken" :mapStyle="mapStyle" :center="center" :zoom="zoom"> -->
-      <!-- <MglGeojsonLayer
+    <MglMap :accessToken="accessToken" :mapStyle="mapStyle" :center="center" :zoom="zoom">
+      <MglGeojsonLayer
         :sourceId="eindhovenData.data.id"
         :source="eindhovenData"
         layerId="tileLayer"
         :layer="tileLayer"
       />
-      <!-- <MglGeojsonLayer
+       <!-- <MglGeojsonLayer
         :sourceId="utrechtData.data.id"
         :source="utrechtData"
         layerId="tileLayer"
         :layer="tileLayer"
-      /> -->
-      <!-- <MglGeojsonLayer
+      />  -->
+      <MglGeojsonLayer
         :sourceId="calls.data.id"
         :source="calls"
         layerId="Test"
         :layer="geoJsonLayer"
-      />  --> 
-    <!-- </MglMap> -->
-    <l-map ref="map"></l-map>
+      />  
+    </MglMap>
   </div>
 </template>
 
 <script>
 import Mapbox from "mapbox-gl";
-import MapLayer from './GeoJsonlayer';
 import { MglMap, MglGeojsonLayer, MglPopUP } from "vue-mapbox";
 
-import L from 'leaflet';
-import {LMap, LTileLayer, LMarker} from 'vue2-leaflet';
 
 import eindhovenData from "../assets/EindhovenNeigh.json";
 import utrechtData from "../assets/UtrechtNeigh.json";
@@ -39,9 +35,6 @@ export default {
   components: {
     MglMap,
     MglGeojsonLayer,
-    LMap,
-    LTileLayer,
-    LMarker
   },
   computed: {
     calls() {
@@ -121,7 +114,6 @@ export default {
   },
   created() {
     this.mapbox = Mapbox;
-    console.log(utrechtData)
   }
 };
 </script>

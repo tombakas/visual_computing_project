@@ -24,6 +24,14 @@
       <label for="fromDate">To</label>
       <input type="datetime-local" name id />
     </div>
+    <h5>Number of incidents</h5>
+    <input type="range" name="limit" id="limit" min="100" max="100000" v-on:change="reloadData()" v-model="limit" step="100">
+    <label for="limit">{{ limit }} incidents</label>
+    <h5>City</h5>
+    <select name="" id="">
+      <option value="city" v-for="(city, index) in cities" :key="index">{{city}}</option>
+    </select>
+    
   </nav>
 </template>
 
@@ -44,11 +52,21 @@ export default {
       timePeriod: {
         from: "",
         to: ""
-      }
+      },
+      limit: 1000,
+      cities: ['Eindhoven', 'Utrecht']
     };
   },
+  methods: {
+    reloadData(){
+      let params = {
+        'limit' : this.limit,
+      }
+      this.$store.dispatch('getCalls', params);
+    }
+  },
   mounted() {
-    this.$store.dispatch("getLatest");
+    this.reloadData();
   }
 };
 </script>
