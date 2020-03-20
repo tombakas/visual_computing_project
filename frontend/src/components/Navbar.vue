@@ -3,7 +3,13 @@
     <h1>App name</h1>
     <h5>Dispatch calls</h5>
     <div v-for="(value, key) in dispatchType" v-bind:key="'dispatch-' + key">
-      <input type="checkbox" :name="value.type" :id="key" v-model="value.checked" />
+      <input
+        type="checkbox"
+        :name="value.type"
+        :id="key"
+        v-model="value.checked"
+        v-on:change="reloadData()"
+      />
       <label
         :for="key"
       >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
@@ -30,7 +36,7 @@
       name="limit"
       id="limit"
       min="100"
-      max="100000"
+      max="50000"
       v-on:change="reloadData()"
       v-model="limit"
       step="100"
@@ -50,7 +56,7 @@ export default {
     return {
       dispatchType: [
         { type: "police", checked: false },
-        { type: "ambulance", checked: false },
+        { type: "ambulance", checked: true },
         { type: "fireBrigade", checked: false }
       ],
       neighborhood: [
@@ -71,9 +77,18 @@ export default {
         limit: this.limit,
         to: this.timePeriod.to
       };
+
       if (this.timePeriod.from !== null) {
         params.from = this.timePeriod.from;
       }
+
+      let type = "";
+      this.dispatchType.forEach(service => {
+        if (service.checked) {
+          type += service.type + ",";
+        }
+      });
+      params.type = type;
       this.$store.dispatch("getCalls", params);
     }
   },
