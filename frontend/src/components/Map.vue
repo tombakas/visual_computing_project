@@ -3,50 +3,38 @@
 </template>
 
 <script>
-import Mapbox from "mapbox-gl";
-import { MglMap, MglGeojsonLayer, MglPopUP } from "vue-mapbox";
-
 import eindhovenData from "../assets/EindhovenNeigh.json";
 import utrechtData from "../assets/UtrechtNeigh.json";
 
 export default {
-  components: {
-    MglMap,
-    MglGeojsonLayer
-  },
   computed: {
-    calls() {
-      
+    calls() {       
       return this.$store.getters.getCalls;
     },
   },
   data() {
     return {
-
-      accessToken:
-        "pk.eyJ1IjoiY2h1cnJvcyIsImEiOiJjazZxdHlkNWQwMGViM21wZHMzMWRxazBvIn0.tdWPYNbC-n38mpRA23WFyQ",
-      mapStyle: "mapbox://styles/mapbox/streets-v11",
       center: [51.4416, 5.4697],
       zoom: 13,
-      tileLayer: {
-        id: "tileLayer",
-        type: "fill",
-        layout: {},
-        paint: {
-          "fill-color": "#088",
-          "fill-opacity": 0.8,
-          "fill-outline-color": "#000000"
-        }
-      },
       map: null,
       layers: [],
       titleLayer: null,
     };
   },
-  created() {
-    this.mapbox = Mapbox;
+  watch: {
+    calls(newCalls, oldCalls) {
+      this.setHeatMap();
+    }
   },
   methods: {
+    setHeatMap(){
+      let incidentCoords = [];
+      this.calls.forEach(call => {
+        incidentCoords.push(call.coords)
+      })
+
+      L.heatLayer(incidentCoords, {}).addTo(this.map);
+    },
     convertNeighborhoods(neighborhoodData, city, id) {
       let cityData = {
         id: id,

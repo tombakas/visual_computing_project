@@ -50,7 +50,10 @@ export default new Vuex.Store({
       axios
         .get("http://localhost:5000/api/calls/" + requestParams)
         .then(result => {
-          commit("SET_DATA", coordToGeoJson(result.data, "latest"));
+          result.data.forEach(call => {
+            call.coords = L.latLng(call.lat, call.lon);
+          })
+          commit("SET_DATA", result.data);
         })
         .catch(error => {
           console.error(error);
@@ -107,29 +110,10 @@ export default new Vuex.Store({
 });
 
 function coordToGeoJson(coords, id) {
-  let geoJson = {
-    type: "geojson",
-    data: {
-      id: id,
-      type: "FeatureCollection",
-      features: []
-    }
-  };
-
-  coords.forEach(coord => {
-    let geoObject = {
-      type: "Feature",
-      properties: {
-        dateTime: coord.datetime,
-        urgency: coord.urgency,
-        service: coord.service
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [coord.lon, coord.lat]
-      }
-    };
-    geoJson.data.features.push(geoObject);
-  });
-  return geoJson;
+//   // console.log(coords);
+//   coords.forEach(coord => {
+//     coord.latlng = L.latlng(coord.lat, coord.lon);
+//   });
+//   console.log(coords)
+  return coords;
 }
