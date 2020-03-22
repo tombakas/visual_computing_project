@@ -6,7 +6,11 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    calls: [],
+    calls: {
+      data: {
+        id: 'default'
+      }
+    },
     timePeriod: {
       from: "",
       to: ""
