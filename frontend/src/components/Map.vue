@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%;" id="map"></div>
+  <div style="width: 100%; height: 100%; z-index: 0;" id="map"></div>
 </template>
 
 <script>
@@ -27,13 +27,14 @@ export default {
     }
   },
   methods: {
-    setHeatMap(){
+    setHeatMap(service){
       let incidentCoords = [];
       this.calls.forEach(call => {
         incidentCoords.push(call.coords)
       })
-
-      L.heatLayer(incidentCoords, {}).addTo(this.map);
+      let heatmap = L.heatLayer(incidentCoords, {});
+      this.layers.push(heatmap);
+      heatmap.addTo(this.map)
     },
     convertNeighborhoods(neighborhoodData, city, id) {
       let cityData = {
