@@ -56,8 +56,9 @@ export default {
     return {
       dispatchType: [
         { type: "police", checked: false },
-        { type: "ambulance", checked: true },
-        { type: "fireBrigade", checked: false }
+        { type: "ambulance", checked: false },
+        { type: "fireBrigade", checked: false },
+        { type: "helicopter", checked: false }
       ],
       neighborhood: [
         { type: "averageIncome", checked: false },
@@ -67,7 +68,7 @@ export default {
         from: null,
         to: new Date().toISOString().split("T")[0]
       },
-      limit: 1000,
+      limit: 100,
       cities: ["Eindhoven", "Utrecht"]
     };
   },
@@ -89,6 +90,7 @@ export default {
         }
       });
       params.type = type;
+      console.log(params)
       this.$store.dispatch("getCalls", params);
     }
   },

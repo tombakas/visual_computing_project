@@ -8,9 +8,9 @@ import utrechtData from "../assets/UtrechtNeigh.json";
 
 export default {
   computed: {
-    calls() {       
+    calls() {
       return this.$store.getters.getCalls;
-    },
+    }
   },
   data() {
     return {
@@ -18,7 +18,7 @@ export default {
       zoom: 13,
       map: null,
       layers: [],
-      titleLayer: null,
+      titleLayer: null
     };
   },
   watch: {
@@ -27,14 +27,49 @@ export default {
     }
   },
   methods: {
-    setHeatMap(service){
-      let incidentCoords = [];
-      this.calls.forEach(call => {
-        incidentCoords.push(call.coords)
-      })
-      let heatmap = L.heatLayer(incidentCoords, {});
-      this.layers.push(heatmap);
-      heatmap.addTo(this.map)
+    setHeatMap() {
+      let allNewCalls = [
+        {
+          type: "ambulance",
+          gradient: { 0.4: "#87F5FB", 0.65: "#2F131E", 1: "#DE3C4B" }
+        },
+        { type: "police", 
+          gradient: { 0.4: "#D58936", 0.65: "#fffb46", 1: "#D58936" } 
+        },
+        {
+          type: "fire-brigade",
+          gradient: { 0.4: "#62466b", 0.65: "#b5c2b7", 1: "#8c93a8" }
+        },
+        {
+          type: "helicopter",
+          gradient: { 0.4: "#ff8cc6", 0.65: "#ffac81", 1: "#de369d" }
+        }
+      ];
+      allNewCalls.forEach(call => {
+        let newCalls = this.calls.filter(callType => {
+          return callType.service === call.type;
+        });
+        console.log(newCalls);
+
+        let layer = this.layers.find(
+          layer => layer.id === "heatmap-" + call.type
+        );
+
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+          this.layers.splice(this.layers.indexOf(layer), 1);
+        }
+
+        let incidentCoords = [];
+        newCalls.forEach(call => {
+          incidentCoords.push(call.coords);
+        });
+
+        layer = L.heatLayer(incidentCoords, {gradient: call.gradient});
+        layer.id = "heatmap-" + call.type;
+        this.layers.push(layer);
+        layer.addTo(this.map);
+      });
     },
     convertNeighborhoods(neighborhoodData, city, id) {
       let cityData = {
@@ -80,14 +115,14 @@ export default {
         });
 
         polygonFeatures.forEach(feature => {
-          feature.leafletObject = L.polygon(feature.coords).bindPopup(
+          feature.leafletObject = L.polygon(feature.coords, {color: "#c2c0c0"}).bindPopup(
             feature.name
           );
         });
       });
 
-      this.layerChanged(0, true);
-      // this.layerChanged(3, true)
+      this.layerChanged("EindhovenNeigh", true);
+      this.layerChanged("UtrechtNeigh", true);
     },
     initMap() {
       this.map = L.map("map").setView(this.center, this.zoom);
@@ -104,11 +139,15 @@ export default {
     }
   },
   mounted() {
-    this.layers.push(this.convertNeighborhoods(eindhovenData, "Eindhoven", 0));
-    // this.layers.push(this.convertNeighborhoods(utrechtData, "Utrecht", 3));
+    this.layers.push(
+      this.convertNeighborhoods(eindhovenData, "Eindhoven", "EindhovenNeigh")
+    );
+    this.layers.push(
+      this.convertNeighborhoods(utrechtData, "Utrecht", "UtrechtNeigh")
+    );
     this.initMap();
-    this.initLayers();    
- }
+    this.initLayers();
+  }
 };
 </script>
 
