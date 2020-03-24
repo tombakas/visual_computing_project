@@ -31,14 +31,14 @@ export default {
       let allNewCalls = [
         {
           type: "ambulance",
-          gradient: { 0.4: "#87F5FB", 0.65: "#2F131E", 1: "#DE3C4B" }
+          gradient: { 0.4: "#dbe900", 0.65: "#e37500", 1: "#b12c00" }
         },
         { type: "police", 
-          gradient: { 0.4: "#D58936", 0.65: "#fffb46", 1: "#D58936" } 
+          gradient: { 0.4: "#2aff50", 0.65: "#00c1d0", 1: "#559dff" } 
         },
         {
           type: "fire-brigade",
-          gradient: { 0.4: "#62466b", 0.65: "#b5c2b7", 1: "#8c93a8" }
+          gradient: { 0.4: "#2e00bf", 0.65: "#8815ff", 1: "#ef00ff" }
         },
         {
           type: "helicopter",

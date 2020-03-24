@@ -12,6 +12,8 @@
       />
       <label
         :for="key"
+        style=" -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+        :style="{backgroundImage: 'linear-gradient(to right,' + value.colors + ')'}"
       >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
     </div>
     <h5>Neighborhood</h5>
@@ -55,10 +57,22 @@ export default {
   data() {
     return {
       dispatchType: [
-        { type: "police", checked: false },
-        { type: "ambulance", checked: false },
-        { type: "fireBrigade", checked: false },
-        { type: "helicopter", checked: false }
+        { type: "police", checked: false, colors: "#dbe900, #e37500, #b12c00" },
+        {
+          type: "ambulance",
+          checked: false,
+          colors: "#2aff50, #00c1d0, #559dff"
+        },
+        {
+          type: "fireBrigade",
+          checked: false,
+          colors: "#2e00bf, #8815ff, #ef00ff"
+        },
+        {
+          type: "helicopter",
+          checked: false,
+          colors: "#ff8cc6, #ffac81 , #de369d"
+        }
       ],
       neighborhood: [
         { type: "averageIncome", checked: false },
@@ -90,7 +104,7 @@ export default {
         }
       });
       params.type = type;
-      console.log(params)
+      console.log(params);
       this.$store.dispatch("getCalls", params);
     }
   },
