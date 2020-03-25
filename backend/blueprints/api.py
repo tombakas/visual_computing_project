@@ -26,7 +26,11 @@ def calls_query_builder(params={}, limit=False):
 
     service = params.get("service")
     if service:
-        conditions.append("service='{}'".format(service))
+        service_conditions = []
+        for item in service.split(","):
+            service_conditions.append("service='{}'".format(item))
+
+        conditions.append("(" + " OR ".join(service_conditions) + ")")
 
     from_date = params.get("from")
     if from_date:
