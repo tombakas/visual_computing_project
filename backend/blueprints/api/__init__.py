@@ -7,6 +7,8 @@ from flask import (
 
 from backend.db import query_db
 
+from .utils import build_conditions, get_cbs_columns
+
 # A Blueprint is just a way to split a Flask app
 # into separate components to make it more organised
 # Reference: http://exploreflask.com/en/latest/blueprints.html
@@ -22,29 +24,11 @@ def close_connection(exception):
 
 
 def calls_query_builder(params={}, limit=False):
-    conditions = [""]
-
-    service = params.get("service")
-    if service:
-        service_conditions = []
-        for item in service.split(","):
-            service_conditions.append("service='{}'".format(item))
-
-        conditions.append("(" + " OR ".join(service_conditions) + ")")
-
-    from_date = params.get("from")
-    if from_date:
-        conditions.append("datetime>='{}'".format(from_date))
-
-    to_date = params.get("to")
-    if to_date:
-        conditions.append("datetime<='{}'".format(to_date))
+    conditions = build_conditions(params, "service")
 
     limit = limit or params.get("limit")
     if limit:
         limit = int(limit)
-
-    conditions = " AND ".join(conditions)
 
     query = """
     SELECT service, datetime, urgency, lat, lon
@@ -61,6 +45,34 @@ def calls_query_builder(params={}, limit=False):
     return r
 
 
+def cbs_query_builder(params={}):
+
+    region = params.get("region")
+    columns = params.get("columns")
+
+    region = "(" + " OR ".join(["region='{}'".format(r) for r in region.split(",")]) + ")"
+
+    if columns:
+        columns = columns.split(",")
+    elif columns is None:
+        columns = get_cbs_columns()
+
+    quoted_columns = ",".join(
+        "{}".format(c) for c in columns
+    )
+
+    query = """
+    SELECT region,{}
+    FROM cbs
+    WHERE {}
+    """.format(
+        quoted_columns,
+        region
+    )
+    r = query_db(query)
+    return r
+
+
 @api.route("/calls/latest/")
 def latest_calls():
     return jsonify(calls_query_builder(limit=100))
@@ -70,4 +82,12 @@ def latest_calls():
 def calls():
     params = request.args
     r = calls_query_builder(params)
+    return jsonify(r)
+
+@api.route("/cbs/")
+def cbs():
+    params = request.args
+    if "region" not in params:
+        return jsonify({"error": "no region supplied"})
+    r = cbs_query_builder(params)
     return jsonify(r)
