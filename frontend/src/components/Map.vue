@@ -5,11 +5,15 @@
 <script>
 import eindhovenData from "../assets/EindhovenNeigh.json";
 import utrechtData from "../assets/UtrechtNeigh.json";
+import axios from "axios";
 
 export default {
   computed: {
     calls() {
       return this.$store.getters.getCalls;
+    },
+    cbsData() {
+      return this.$store.getter.getCbs;
     }
   },
   data() {
@@ -33,8 +37,9 @@ export default {
           type: "ambulance",
           gradient: { 0.4: "#dbe900", 0.65: "#e37500", 1: "#b12c00" }
         },
-        { type: "police", 
-          gradient: { 0.4: "#2aff50", 0.65: "#00c1d0", 1: "#559dff" } 
+        {
+          type: "police",
+          gradient: { 0.4: "#2aff50", 0.65: "#00c1d0", 1: "#559dff" }
         },
         {
           type: "fire-brigade",
@@ -65,7 +70,7 @@ export default {
           incidentCoords.push(call.coords);
         });
 
-        layer = L.heatLayer(incidentCoords, {gradient: call.gradient});
+        layer = L.heatLayer(incidentCoords, { gradient: call.gradient });
         layer.id = "heatmap-" + call.type;
         this.layers.push(layer);
         layer.addTo(this.map);
@@ -115,14 +120,22 @@ export default {
         });
 
         polygonFeatures.forEach(feature => {
-          feature.leafletObject = L.polygon(feature.coords, {color: "#c2c0c0"}).bindPopup(
-            feature.name
-          );
+          axios
+            .get("http://localhost:5000/api/cbs?region=" + feature.name)
+            .then(result => {
+              console.log(result.data[0].region);
+              feature.leafletObject = L.polygon(feature.coords, {
+                color: "#c2c0c0"
+              }).bindPopup(feature.name);
+            })
+            .catch(error => {
+              console.error(feature.name, error);
+            });
         });
       });
 
       this.layerChanged("EindhovenNeigh", true);
-      this.layerChanged("UtrechtNeigh", true);
+      // this.layerChanged("UtrechtNeigh", true);
     },
     initMap() {
       this.map = L.map("map").setView(this.center, this.zoom);

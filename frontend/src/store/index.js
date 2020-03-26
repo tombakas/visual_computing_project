@@ -8,7 +8,7 @@ export default new Vuex.Store({
   state: {
     calls: {
       data: {
-        id: 'default'
+        id: "default"
       }
     },
     timePeriod: {
@@ -16,7 +16,7 @@ export default new Vuex.Store({
       to: ""
     },
     dispatchType: {},
-    neighborhood: {},
+    neighborhoodData: {},
     events: []
   },
   mutations: {
@@ -28,6 +28,9 @@ export default new Vuex.Store({
     },
     SET_EVENTS(state, events) {
       state.events = events;
+    },
+    SET_CBS(state, data) {
+      state.neighborhoodData = data;
     }
   },
   actions: {
@@ -52,8 +55,30 @@ export default new Vuex.Store({
         .then(result => {
           result.data.forEach(call => {
             call.coords = L.latLng(call.lat, call.lon);
-          })
+          });
           commit("SET_DATA", result.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    getCbsData({ commit }, params) {
+      let requestParams = "?";
+      requestParams += "region=" + params.neighborhood;
+      if (params.columns !== undefined && params.columns.length > 0) {
+        requestParams += "&columns=";
+      }
+      params.columns.forEach((column, index) => {
+        if (index > 0) {
+          requestParams += ",";
+        }
+        requestParams += column;
+      });
+
+      axios
+        .get("http://localhost:5000/api/cbs" + requestParams)
+        .then(result => {
+          commit("SET_CBS", result.data);
         })
         .catch(error => {
           console.error(error);
@@ -105,15 +130,16 @@ export default new Vuex.Store({
   },
   getters: {
     getCalls: state => state.calls,
-    getEvents: state => state.events
+    getEvents: state => state.events,
+    getCbs: state => state.neighborhoodData
   }
 });
 
 function coordToGeoJson(coords, id) {
-//   // console.log(coords);
-//   coords.forEach(coord => {
-//     coord.latlng = L.latlng(coord.lat, coord.lon);
-//   });
-//   console.log(coords)
+  //   // console.log(coords);
+  //   coords.forEach(coord => {
+  //     coord.latlng = L.latlng(coord.lat, coord.lon);
+  //   });
+  //   console.log(coords)
   return coords;
 }

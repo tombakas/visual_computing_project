@@ -100,13 +100,15 @@ export default {
       let type = "";
       this.dispatchType.forEach(service => {
         if (service.checked) {
-          type += service.type + ",";
+          if (type !== "") {
+            type += ",";
+          }
+          type += service.type;
         }
       });
-      params.type = type;
-      console.log(params);
+      params.service = type;
       this.$store.dispatch("getCalls", params);
-    }
+    },
   },
   mounted() {
     this.reloadData();
