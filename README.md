@@ -29,6 +29,11 @@ decreasing order. Available api endpoints:
   * `from`: inclusive date from which records start, format: `YYYY-MM-DD`
   * `to`: inclusive date to which records span, format: `YYYY-MM-DD`
   * `limit`: limit response to latest **n** records.
+* `/api/cbs`:
+  This endpoint takes the following parameters:
+  * `region`: comma separated list of regions to return
+  * `columns`: comma separated list of columns returned in response, `region`
+      is always included as a column.
 
 ## Response schema
 ```yaml

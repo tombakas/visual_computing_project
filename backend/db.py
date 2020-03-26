@@ -45,9 +45,11 @@ def build_json_response(db_response, keys):
     return json_response
 
 
-def query_db(query, args=()):
+def query_db(query, args=(), json_response=True):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
+    if not json_response:
+        return rv
     cur.close()
     keys = extract_column_names(query)
     return build_json_response(rv, keys)
