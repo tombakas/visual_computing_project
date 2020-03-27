@@ -54,7 +54,6 @@ export default {
         let newCalls = this.calls.filter(callType => {
           return callType.service === call.type;
         });
-        console.log(newCalls);
 
         let layer = this.layers.find(
           layer => layer.id === "heatmap-" + call.type
@@ -123,14 +122,17 @@ export default {
           axios
             .get("http://localhost:5000/api/cbs?region=" + feature.name)
             .then(result => {
-              console.log(result.data[0].region);
-              feature.leafletObject = L.polygon(feature.coords, {
-                color: "#c2c0c0"
-              }).bindPopup(feature.name);
+              feature.leafletObject.bindPopup(
+                this.setNeighborhoodProps(result.data[0])
+              );
             })
             .catch(error => {
               console.error(feature.name, error);
             });
+
+          feature.leafletObject = L.polygon(feature.coords, {
+            color: "#c2c0c0"
+          });
         });
       });
 
@@ -149,6 +151,14 @@ export default {
       );
 
       this.tileLayer.addTo(this.map);
+    },
+    setNeighborhoodProps(data) {
+      let dataString = "<ul>";
+      for (const prop in data) {
+        dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
+      }
+      dataString += "</ul>";
+      return dataString;
     }
   },
   mounted() {
