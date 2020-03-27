@@ -16,12 +16,12 @@
         :style="{backgroundImage: 'linear-gradient(to right,' + value.colors + ')'}"
       >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
     </div>
-    <h5>Neighborhood</h5>
-    <div v-for="(value, key) in neighborhood" v-bind:key="'neighborhood-' + key">
-      <input type="checkbox" :name="value.type" :id="key" v-model="value.checked" />
+    <h5>Neighborhood attributes</h5>
+    <div v-for="(attr, key) in cbsAttributes" v-bind:key="'neighborhood-' + key">
+      <input type="checkbox" :name="attr.key" :id="key" v-model="attr.queried.checked" />
       <label
         :for="key"
-      >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
+      >{{ attr.key }}</label>
     </div>
     <h5>Time period</h5>
     <div>
@@ -53,7 +53,11 @@
 
 <script>
 export default {
-  computed: {},
+  computed: {
+    cbsAttributes(){
+      return this.$store.getters.getCbsKey;
+    }
+  },
   data() {
     return {
       dispatchType: [

@@ -155,7 +155,7 @@ export default {
     setNeighborhoodProps(data) {
       let dataString = "<ul>";
       for (const prop in data) {
-        dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
+        dataString += `<li>${this.$store.getters.getCbsKey[prop].key}: ${data[prop]}</li>`;
       }
       dataString += "</ul>";
       return dataString;
