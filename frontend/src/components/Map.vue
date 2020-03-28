@@ -108,26 +108,26 @@ export default {
     },
     setCbsPopup() {
       this.layers.forEach(layer => {
-
         if (Array.isArray(layer)) {
-          console.log('aborting')
           return;
         }
 
-        if (layer.features === undefined){
+        if (layer.features === undefined) {
           return;
         }
-        console.log(layer);
+
+        this.layerChanged("EindhovenNeigh", false);
+        this.layerChanged("UtrechtNeigh", false);
+
         const polygonFeatures = layer.features.filter(
           feature => feature.type === "polygon"
         );
-
 
         polygonFeatures.forEach(feature => {
           feature.name = feature.name.replace(/(\,|\')/g, "");
           let requestParams = "?region=" + feature.name;
           if (this.cbsAttributes.length > 0) {
-            requestParams += "&columns="
+            requestParams += "&columns=";
             this.cbsAttributes.forEach(attribute => {
               if (requestParams.slice(requestParams.length - 1) !== "=") {
                 requestParams += ",";
@@ -139,7 +139,6 @@ export default {
             .get("http://localhost:5000/api/cbs" + requestParams)
             .then(result => {
               feature.leafletObject.unbindPopup();
-              console.log(feature.leafletObject);
               feature.leafletObject.bindPopup(
                 this.setNeighborhoodProps(result.data[0])
               );
@@ -182,7 +181,6 @@ export default {
               }
               requestParams += attribute;
             });
-            console.log(requestParams);
           }
           axios
             .get("http://localhost:5000/api/cbs?region=" + feature.name)
