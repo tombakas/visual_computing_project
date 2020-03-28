@@ -6,14 +6,66 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    calls: [],
+    calls: {
+      data: {
+        id: "default"
+      }
+    },
     timePeriod: {
       from: "",
       to: ""
     },
     dispatchType: {},
-    neighborhood: {},
-    events: []
+    neighborhoodData: {},
+    events: [],
+    cbsAttributes: [],
+    cbsDataKey: {
+      a_00_14: "Age 0-14",
+      a_15_24: "Age 15-24",
+      a_25_44: "Age 25-44",
+      a_45_64: "Age 45-64",
+      a_65_oo: "Age 65+",
+      a_ao: "Disability allowance",
+      a_aow: "Old age pension",
+      a_bijstand: "Social security payments",
+      a_car: "#cars",
+      a_comp: "#companies",
+      a_died: "#died",
+      a_female: "#females",
+      a_hh: "#households",
+      a_house: "#houses",
+      a_inc_rec: "#income recipients",
+      a_inh: "#inhabitants",
+      a_lan_ac: "Area in acres",
+      a_male: "#males",
+      a_nw_all: "#non-western persons",
+      a_sur_ac: "Surface area in acres",
+      a_w_all: "#western persons",
+      a_wat_ac: "Water area in acres",
+      a_ww: "#persons in unemployment security law",
+      av_assault: "#assaults (avg)",
+      av_car_hh: "#cars per household (avg)",
+      av_des_po: "#destruction and public misbehavior (avg)",
+      av_hh_size: "Average household size",
+      av_hou_theft: "#theft in houses (avg)",
+      av_inc_inh_x1000: "Income per 1000 (avg)",
+      av_inc_rec_x1000: "Average income per income recipient x1000",
+      av_km_dc: "Distance to daycare in km (avg)",
+      av_km_doc: "Distance to gp in km (avg)",
+      av_km_sc: "Distance to school in km (avg)",
+      av_km_sup: "Distance to supermarket in km (avg)",
+      av_prop_val_x1000: "Property value x1000 (avg)",
+      city_name: "Name of city",
+      p_hh_usm: "Percentage of households under social minimum",
+      p_n_act: "Percentage of working people",
+      per_build_af_2000: "Percentage houses built after 2000",
+      per_build_be_2000: "Percentage houses built before 2000",
+      per_own_occ: "Percentage occupied houses",
+      per_ren_hou: "Percentage of rental houses",
+      per_uninhab: "Percentage of houses uninhabited",
+      pop_den_km2: "Population density per km2 ",
+      region: "Neighborhood name"
+    }
   },
   mutations: {
     SET_DATA(state, calls) {
@@ -24,6 +76,18 @@ export default new Vuex.Store({
     },
     SET_EVENTS(state, events) {
       state.events = events;
+    },
+    SET_CBS(state, data) {
+      state.neighborhoodData = data;
+    },
+    SET_ATTRIBUTE(state, attribute) {
+      if (state.cbsAttributes.indexOf(attribute) !== -1) {
+        state.cbsAttributes = state.cbsAttributes.filter(attr => {
+          return attr !== attribute;
+        });
+      } else {
+        state.cbsAttributes.push(attribute);
+      }
     }
   },
   actions: {
@@ -31,134 +95,52 @@ export default new Vuex.Store({
       commit("SET_TIME_PERIOD", timePeriod);
     },
     getLatest({ commit }) {
-      let demoGeoJson = {
-        type: "geojson",
-        data: {
-          id: "thisIsMySource",
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.472650527954102, 51.44352269273299]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.482349395751953, 51.43811917142602]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.497884750366211, 51.43865420205084]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.486040115356445, 51.429825395309614]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.453939437866211, 51.43897521741748]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.461492538452148, 51.42072726427204]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.472650527954102, 51.44352269273299]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.482349395751953, 51.43811917142602]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.497884750366211, 51.43865420205084]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.486040115356445, 51.429825395309614]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.453939437866211, 51.43897521741748]
-              }
-            },
-            {
-              type: "Feature",
-              properties: {},
-              geometry: {
-                type: "Point",
-                coordinates: [5.461492538452148, 51.42072726427204]
-              }
-            }
-          ]
-        }
-      };
-      // commit("SET_DATA", demoGeoJson);
       axios
-        .get("http://localhost:5000/api/calls/latest")
+        .get("http://localhost:5000/api/calls/?limit=10000")
         .then(result => {
           commit("SET_DATA", coordToGeoJson(result.data, "latest"));
         })
-        .catch(error => {
-        });
+        .catch(error => {});
     },
     getCalls({ commit }, params) {
       let requestParams = "?";
       for (let param in params) {
-        requestParams += `${param}: ${params[param]}`;
+        requestParams += `${param}=${params[param]}&`;
       }
       axios
-        .get("http://localhost:5000/api/calls" + requestParams)
+        .get("http://localhost:5000/api/calls/" + requestParams)
         .then(result => {
-          commit("SET_DATA", coordToGeoJson(result.data));
+          result.data.forEach(call => {
+            call.coords = L.latLng(call.lat, call.lon);
+          });
+          commit("SET_DATA", result.data);
         })
         .catch(error => {
           console.error(error);
         });
     },
+    // getCbsData({ commit }, params) {
+    //   let requestParams = "?";
+    //   requestParams += "region=" + params.neighborhood;
+    //   if (params.columns !== undefined && params.columns.length > 0) {
+    //     requestParams += "&columns=";
+    //   }
+    //   params.columns.forEach((column, index) => {
+    //     if (index > 0) {
+    //       requestParams += ",";
+    //     }
+    //     requestParams += column;
+    //   });
+
+    //   axios
+    //     .get("http://localhost:5000/api/cbs" + requestParams)
+    //     .then(result => {
+    //       commit("SET_CBS", result.data);
+    //     })
+    //     .catch(error => {
+    //       console.error(error);
+    //     });
+    // },
     getEvents({ commit }, dateTimeRange, city) {
       // ! DEMO CODE ONLY
       let demoEvents = [
@@ -201,38 +183,16 @@ export default new Vuex.Store({
       //   .catch(error => {
       //     console.error(error);
       //   });
+    },
+    setAttribute({ commit }, attribute) {
+      commit("SET_ATTRIBUTE", attribute);
     }
   },
   getters: {
     getCalls: state => state.calls,
-    getEvents: state => state.events
+    getEvents: state => state.events,
+    getCbs: state => state.neighborhoodData,
+    getCbsKey: state => state.cbsDataKey,
+    getCbsAttributes: state => state.cbsAttributes
   }
 });
-
-function coordToGeoJson(coords, id) {
-  let geoJson = {
-    type: "geojson",
-    data: {
-      id: id,
-      type: "FeatureCollection",
-      features: []
-    }
-  };
-
-  coords.forEach(coord => {
-    let geoObject = {
-      type: "Feature",
-      properties: {
-        dateTime: coord.datetime,
-        urgency: coord.urgency,
-        service: coord.service
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [coord.lon, coord.lat]
-      }
-    };
-    geoJson.data.features.push(geoObject);
-  });
-  return geoJson;
-}

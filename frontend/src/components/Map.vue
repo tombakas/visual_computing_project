@@ -1,91 +1,246 @@
 <template>
-  <div style="width: 100%; height: 100%;">
-    <MglMap :accessToken="accessToken" :mapStyle="mapStyle" :center="center" :zoom="zoom">
-      <MglGeojsonLayer
-        :sourceId="calls.data.id"
-        :source="calls"
-        layerId="Test"
-        :layer="geoJsonLayer"
-      />
-    </MglMap>
-  </div>
+  <div style="width: 100%; height: 100%; z-index: 0;" id="map"></div>
 </template>
 
 <script>
-import Mapbox from "mapbox-gl";
-import { MglMap, MglGeojsonLayer } from "vue-mapbox";
+import eindhovenData from "../assets/EindhovenNeigh.json";
+import utrechtData from "../assets/UtrechtNeigh.json";
+import axios from "axios";
 
 export default {
-  components: {
-    MglMap,
-    MglGeojsonLayer
-  },
   computed: {
     calls() {
       return this.$store.getters.getCalls;
+    },
+    cbsAttributes() {
+      return this.$store.getters.getCbsAttributes;
     }
   },
   data() {
     return {
-      accessToken:
-        "pk.eyJ1IjoiY2h1cnJvcyIsImEiOiJjazZxdHlkNWQwMGViM21wZHMzMWRxazBvIn0.tdWPYNbC-n38mpRA23WFyQ",
-      mapStyle: "mapbox://styles/mapbox/streets-v11",
-      center: [5.4697, 51.4416],
-      zoom: 11.5,
-      geoJsonLayer: {
-        type: "heatmap",
-        paint: {
-          // Increase the heatmap weight based on frequency and property magnitude
-          "heatmap-weight": [
-            "interpolate",
-            ["linear"],
-            ["get", "mag"],
-            0,
-            0,
-            6,
-            1
-          ],
-          // Increase the heatmap color weight weight by zoom level
-          // heatmap-intensity is a multiplier on top of heatmap-weight
-          "heatmap-intensity": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            0,
-            1,
-            9,
-            3
-          ],
-          // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
-          // Begin color ramp at 0-stop with a 0-transparancy color
-          // to create a blur-like effect.
-          "heatmap-color": [
-            "interpolate",
-            ["linear"],
-            ["heatmap-density"],
-            0,
-            "rgba(33,102,172,0)",
-            0.2,
-            "rgb(103,169,207)",
-            0.4,
-            "rgb(209,229,240)",
-            0.6,
-            "rgb(253,219,199)",
-            0.8,
-            "rgb(239,138,98)",
-            1,
-            "rgb(178,24,43)"
-          ],
-          // Adjust the heatmap radius by zoom level
-          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 9, 10],
-          // Transition from heatmap to circle layer by zoom level
-          "heatmap-opacity": ["interpolate", ["linear"], ["zoom"], 11, 1, 19, 3]
-        }
-      }
+      center: [51.4416, 5.4697],
+      zoom: 13,
+      map: null,
+      layers: [],
+      titleLayer: null
     };
   },
-  created() {
-    this.mapbox = Mapbox;
+  watch: {
+    calls(newCalls, oldCalls) {
+      this.setHeatMap();
+    },
+    cbsAttributes(newData, oldData) {
+      this.setCbsPopup();
+    }
+  },
+  methods: {
+    setHeatMap() {
+      let allNewCalls = [
+        {
+          type: "ambulance",
+          gradient: { 0.4: "#dbe900", 0.65: "#e37500", 1: "#b12c00" }
+        },
+        {
+          type: "police",
+          gradient: { 0.4: "#2aff50", 0.65: "#00c1d0", 1: "#559dff" }
+        },
+        {
+          type: "fire-brigade",
+          gradient: { 0.4: "#2e00bf", 0.65: "#8815ff", 1: "#ef00ff" }
+        },
+        {
+          type: "helicopter",
+          gradient: { 0.4: "#ff8cc6", 0.65: "#ffac81", 1: "#de369d" }
+        }
+      ];
+      allNewCalls.forEach(call => {
+        let newCalls = this.calls.filter(callType => {
+          return callType.service === call.type;
+        });
+
+        let layer = this.layers.find(
+          layer => layer.id === "heatmap-" + call.type
+        );
+
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+          this.layers.splice(this.layers.indexOf(layer), 1);
+        }
+
+        let incidentCoords = [];
+        newCalls.forEach(call => {
+          incidentCoords.push(call.coords);
+        });
+
+        layer = L.heatLayer(incidentCoords, { gradient: call.gradient });
+        layer.id = "heatmap-" + call.type;
+        this.layers.push(layer);
+        layer.addTo(this.map);
+      });
+    },
+    convertNeighborhoods(neighborhoodData, city, id) {
+      let cityData = {
+        id: id,
+        name: city,
+        active: false,
+        features: []
+      };
+
+      neighborhoodData.data.features.forEach(neighborhood => {
+        let neighborhoodGeo = {
+          name: neighborhood.properties.nameNeigh,
+          type: "polygon",
+          coords: neighborhood.geometry.coordinates
+        };
+        cityData.features.push(neighborhoodGeo);
+      });
+      return cityData;
+    },
+    layerChanged(layerId, active) {
+      const layer = this.layers.find(layer => layer.id === layerId);
+      layer.features.forEach(feature => {
+        if (active) {
+          feature.leafletObject.addTo(this.map);
+        } else {
+          feature.leafletObject.removeFrom(this.map);
+        }
+      });
+    },
+    setCbsPopup() {
+      this.layers.forEach(layer => {
+        if (Array.isArray(layer)) {
+          return;
+        }
+
+        if (layer.features === undefined) {
+          return;
+        }
+
+        this.layerChanged("EindhovenNeigh", false);
+        this.layerChanged("UtrechtNeigh", false);
+
+        const polygonFeatures = layer.features.filter(
+          feature => feature.type === "polygon"
+        );
+
+        polygonFeatures.forEach(feature => {
+          feature.name = feature.name.replace(/(\,|\')/g, "");
+          let requestParams = "?region=" + feature.name;
+          if (this.cbsAttributes.length > 0) {
+            requestParams += "&columns=";
+            this.cbsAttributes.forEach(attribute => {
+              if (requestParams.slice(requestParams.length - 1) !== "=") {
+                requestParams += ",";
+              }
+              requestParams += attribute;
+            });
+          }
+          axios
+            .get("http://localhost:5000/api/cbs" + requestParams)
+            .then(result => {
+              feature.leafletObject.unbindPopup();
+              feature.leafletObject.bindPopup(
+                this.setNeighborhoodProps(result.data[0])
+              );
+            })
+            .catch(error => {
+              console.error(feature.name, error);
+            });
+
+          feature.leafletObject = L.polygon(feature.coords, {
+            color: "#c2c0c0"
+          });
+        });
+      });
+
+      this.layerChanged("EindhovenNeigh", true);
+      this.layerChanged("UtrechtNeigh", true);
+    },
+    initLayers() {
+      this.layers.forEach(layer => {
+        const markerFeatures = layer.features.filter(
+          feature => feature.type === "marker"
+        );
+        const polygonFeatures = layer.features.filter(
+          feature => feature.type === "polygon"
+        );
+
+        markerFeatures.forEach(feature => {
+          feature.leafletObject = L.marker(feature.coords).bindPopup(
+            feature.name
+          );
+        });
+
+        polygonFeatures.forEach(feature => {
+          feature.name = feature.name.replace(/(\,|\')/g, "");
+          let requestParams = "?region=" + feature.name;
+          if (this.cbsAttributes.length > 0) {
+            this.requestParams.forEach(attribute => {
+              if (requestParams.indexOf("=") !== -1) {
+                requestParams += ",";
+              }
+              requestParams += attribute;
+            });
+          }
+          axios
+            .get("http://localhost:5000/api/cbs?region=" + feature.name)
+            .then(result => {
+              feature.leafletObject.bindPopup(
+                this.setNeighborhoodProps(result.data[0])
+              );
+            })
+            .catch(error => {
+              console.error(feature.name, error);
+            });
+
+          feature.leafletObject = L.polygon(feature.coords, {
+            color: "#c2c0c0"
+          });
+        });
+      });
+
+      this.layerChanged("EindhovenNeigh", true);
+      this.layerChanged("UtrechtNeigh", true);
+    },
+    initMap() {
+      this.map = L.map("map").setView(this.center, this.zoom);
+      this.tileLayer = L.tileLayer(
+        "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png",
+        {
+          maxZoom: 18,
+          attribution:
+            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+        }
+      );
+
+      this.tileLayer.addTo(this.map);
+    },
+    setNeighborhoodProps(data) {
+      let dataString = "<ul>";
+      for (const prop in data) {
+        if (prop.indexOf("_cat") > -1) {
+          dataString += `<li>${
+            this.$store.getters.getCbsKey[
+              prop.substring(0, prop.indexOf("_cat"))
+            ]
+          } categorized: ${data[prop]}</li>`;
+        } else {
+          dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
+        }
+      }
+      dataString += "</ul>";
+      return dataString;
+    }
+  },
+  mounted() {
+    this.layers.push(
+      this.convertNeighborhoods(eindhovenData, "Eindhoven", "EindhovenNeigh")
+    );
+    this.layers.push(
+      this.convertNeighborhoods(utrechtData, "Utrecht", "UtrechtNeigh")
+    );
+    this.initMap();
+    this.initLayers();
   }
 };
 </script>
