@@ -2,8 +2,8 @@ from flask import g
 
 from backend.db import query_db
 
-def build_conditions(params={}, column_param=None):
-    conditions = [""]
+def build_conditions(params={}, date_column="datetime", column_param=None):
+    conditions = []
 
     column = None
     if column_param is not None:
@@ -17,11 +17,11 @@ def build_conditions(params={}, column_param=None):
 
     from_date = params.get("from")
     if from_date:
-        conditions.append("datetime>='{}'".format(from_date))
+        conditions.append(date_column + ">='{}'".format(from_date))
 
     to_date = params.get("to")
     if to_date:
-        conditions.append("datetime<='{}'".format(to_date))
+        conditions.append(date_column + "<='{}'".format(to_date))
 
     conditions = " AND ".join(conditions)
     return conditions

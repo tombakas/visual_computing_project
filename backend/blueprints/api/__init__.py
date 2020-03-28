@@ -1,3 +1,5 @@
+import sqlite3
+
 from flask import (
     g,
     Blueprint,
@@ -24,7 +26,7 @@ def close_connection(exception):
 
 
 def calls_query_builder(params={}, limit=False):
-    conditions = build_conditions(params, "service")
+    conditions = build_conditions(params, column_param="service")
 
     limit = limit or params.get("limit")
     if limit:
@@ -33,12 +35,34 @@ def calls_query_builder(params={}, limit=False):
     query = """
     SELECT service, datetime, urgency, lat, lon
     FROM calls
-    WHERE lat IS NOT NULL {}
+    WHERE lat IS NOT NULL AND {}
     ORDER BY date(datetime) DESC
     {}
 
     """.format(
-        conditions,
+        conditions if conditions else "TRUE",
+        "LIMIT {}".format(limit) if limit else ""
+    )
+    r = query_db(query)
+    return r
+
+
+def events_query_builder(params={}, limit=False):
+    conditions = build_conditions(params, "date", "service")
+
+    limit = limit or params.get("limit")
+    if limit:
+        limit = int(limit)
+
+    query = """
+    SELECT date, name, location, city
+    FROM events
+    WHERE {}
+    ORDER BY date(date) DESC
+    {}
+
+    """.format(
+        conditions if conditions else "TRUE",
         "LIMIT {}".format(limit) if limit else ""
     )
     r = query_db(query)
@@ -69,7 +93,12 @@ def cbs_query_builder(params={}):
         quoted_columns,
         region
     )
-    r = query_db(query)
+    try:
+        r = query_db(query)
+    except sqlite3.OperationalError as e:
+        return jsonify(
+            {"Error": str(e)}
+        )
     return r
 
 
@@ -81,7 +110,12 @@ def latest_calls():
 @api.route("/calls/")
 def calls():
     params = request.args
-    r = calls_query_builder(params)
+    try:
+        r = calls_query_builder(params)
+    except sqlite3.OperationalError as e:
+        return jsonify(
+            {"Error": str(e)}
+        )
     return jsonify(r)
 
 @api.route("/cbs/")
@@ -89,5 +123,25 @@ def cbs():
     params = request.args
     if "region" not in params:
         return jsonify({"error": "no region supplied"})
-    r = cbs_query_builder(params)
+    try:
+        r = cbs_query_builder(params)
+    except sqlite3.OperationalError as e:
+        return jsonify(
+            {"Error": str(e)}
+        )
+
+    return jsonify(r)
+
+@api.route("/events/")
+def events():
+    params = request.args
+    if "city" not in params:
+        return jsonify({"error": "no city supplied"})
+    try:
+        r = events_query_builder(params)
+    except sqlite3.OperationalError as e:
+        return jsonify(
+            {"Error": str(e)}
+        )
+
     return jsonify(r)
