@@ -30,6 +30,7 @@ export default {
       this.setHeatMap();
     },
     cbsAttributes(newData, oldData) {
+      this.setCbsPopup();
     }
   },
   methods: {
@@ -105,6 +106,57 @@ export default {
         }
       });
     },
+    setCbsPopup() {
+      this.layers.forEach(layer => {
+
+        if (Array.isArray(layer)) {
+          console.log('aborting')
+          return;
+        }
+
+        if (layer.features === undefined){
+          return;
+        }
+        console.log(layer);
+        const polygonFeatures = layer.features.filter(
+          feature => feature.type === "polygon"
+        );
+
+
+        polygonFeatures.forEach(feature => {
+          feature.name = feature.name.replace(/(\,|\')/g, "");
+          let requestParams = "?region=" + feature.name;
+          if (this.cbsAttributes.length > 0) {
+            requestParams += "&columns="
+            this.cbsAttributes.forEach(attribute => {
+              if (requestParams.slice(requestParams.length - 1) !== "=") {
+                requestParams += ",";
+              }
+              requestParams += attribute;
+            });
+          }
+          axios
+            .get("http://localhost:5000/api/cbs" + requestParams)
+            .then(result => {
+              feature.leafletObject.unbindPopup();
+              console.log(feature.leafletObject);
+              feature.leafletObject.bindPopup(
+                this.setNeighborhoodProps(result.data[0])
+              );
+            })
+            .catch(error => {
+              console.error(feature.name, error);
+            });
+
+          feature.leafletObject = L.polygon(feature.coords, {
+            color: "#c2c0c0"
+          });
+        });
+      });
+
+      this.layerChanged("EindhovenNeigh", true);
+      this.layerChanged("UtrechtNeigh", true);
+    },
     initLayers() {
       this.layers.forEach(layer => {
         const markerFeatures = layer.features.filter(
@@ -121,7 +173,17 @@ export default {
         });
 
         polygonFeatures.forEach(feature => {
-          feature.name = feature.name.replace(/(\,|\')/g, '');
+          feature.name = feature.name.replace(/(\,|\')/g, "");
+          let requestParams = "?region=" + feature.name;
+          if (this.cbsAttributes.length > 0) {
+            this.requestParams.forEach(attribute => {
+              if (requestParams.indexOf("=") !== -1) {
+                requestParams += ",";
+              }
+              requestParams += attribute;
+            });
+            console.log(requestParams);
+          }
           axios
             .get("http://localhost:5000/api/cbs?region=" + feature.name)
             .then(result => {
@@ -158,11 +220,14 @@ export default {
     setNeighborhoodProps(data) {
       let dataString = "<ul>";
       for (const prop in data) {
-        if (prop.indexOf('_cat') > -1) {
-          dataString += `<li>${this.$store.getters.getCbsKey[prop.substring(0, prop.indexOf('_cat'))]} categorized: ${data[prop]}</li>`;
-
+        if (prop.indexOf("_cat") > -1) {
+          dataString += `<li>${
+            this.$store.getters.getCbsKey[
+              prop.substring(0, prop.indexOf("_cat"))
+            ]
+          } categorized: ${data[prop]}</li>`;
         } else {
-        dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
+          dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
         }
       }
       dataString += "</ul>";
