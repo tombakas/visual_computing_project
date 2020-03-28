@@ -49,3 +49,4 @@ yarn-error.log*
 app/static/js/*
 app/static/img/*
 app/static/css/*
+db/calls.db
