@@ -16,12 +16,18 @@
         :style="{backgroundImage: 'linear-gradient(to right,' + value.colors + ')'}"
       >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
     </div>
-    <h5>Neighborhood attributes</h5>
-    <div v-for="(attr, key) in cbsAttributes" v-bind:key="'neighborhood-' + key">
-      <input type="checkbox" :name="attr.key" :id="key" v-model="attr.queried.checked" />
+    <h5>Neighborhood</h5>
+    <div v-for="(value, key) in neighborhood" v-bind:key="'neighborhood-' + key">
+      <input
+        type="checkbox"
+        :name="value.type"
+        :id="key"
+        v-model="value.checked"
+        v-on:change="setAttribute(value.key)"
+      />
       <label
         :for="key"
-      >{{ attr.key }}</label>
+      >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
     </div>
     <h5>Time period</h5>
     <div>
@@ -52,12 +58,10 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  computed: {
-    cbsAttributes(){
-      return this.$store.getters.getCbsKey;
-    }
-  },
+  computed: {},
   data() {
     return {
       dispatchType: [
@@ -78,10 +82,7 @@ export default {
           colors: "#ff8cc6, #ffac81 , #de369d"
         }
       ],
-      neighborhood: [
-        { type: "averageIncome", checked: false },
-        { type: "crimeRates", checked: false }
-      ],
+      neighborhood: [],
       timePeriod: {
         from: null,
         to: new Date().toISOString().split("T")[0]
@@ -113,9 +114,37 @@ export default {
       params.service = type;
       this.$store.dispatch("getCalls", params);
     },
+    loadCbsAttributes() {
+      axios
+        .get("http://localhost:5000/api/cbs?region=Binnenstad")
+        .then(result => {
+          for (let attr in result.data[0]) {
+            if (attr.indexOf("_cat") > -1) {
+              let orignalKey = attr.substring(0, attr.indexOf("_cat"));
+              this.neighborhood.push({
+                type:
+                  this.$store.getters.getCbsKey[orignalKey] + " categorized",
+                key: attr,
+                checked: false
+              });
+            } else {
+              this.neighborhood.push({
+                type: this.$store.getters.getCbsKey[attr],
+                key: attr,
+
+                checked: false
+              });
+            }
+          }
+        });
+    },
+    setAttribute(attribute) {
+      this.$store.dispatch('setAttribute', attribute)
+    }
   },
   mounted() {
     this.reloadData();
+    this.loadCbsAttributes();
   }
 };
 </script>

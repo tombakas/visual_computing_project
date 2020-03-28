@@ -12,8 +12,8 @@ export default {
     calls() {
       return this.$store.getters.getCalls;
     },
-    cbsData() {
-      return this.$store.getter.getCbs;
+    cbsAttributes() {
+      return this.$store.getters.getCbsAttributes;
     }
   },
   data() {
@@ -28,6 +28,8 @@ export default {
   watch: {
     calls(newCalls, oldCalls) {
       this.setHeatMap();
+    },
+    cbsAttributes(newData, oldData) {
     }
   },
   methods: {
@@ -119,6 +121,7 @@ export default {
         });
 
         polygonFeatures.forEach(feature => {
+          feature.name = feature.name.replace(/(\,|\')/g, '');
           axios
             .get("http://localhost:5000/api/cbs?region=" + feature.name)
             .then(result => {
@@ -137,7 +140,7 @@ export default {
       });
 
       this.layerChanged("EindhovenNeigh", true);
-      // this.layerChanged("UtrechtNeigh", true);
+      this.layerChanged("UtrechtNeigh", true);
     },
     initMap() {
       this.map = L.map("map").setView(this.center, this.zoom);
@@ -155,7 +158,12 @@ export default {
     setNeighborhoodProps(data) {
       let dataString = "<ul>";
       for (const prop in data) {
-        dataString += `<li>${this.$store.getters.getCbsKey[prop].key}: ${data[prop]}</li>`;
+        if (prop.indexOf('_cat') > -1) {
+          dataString += `<li>${this.$store.getters.getCbsKey[prop.substring(0, prop.indexOf('_cat'))]} categorized: ${data[prop]}</li>`;
+
+        } else {
+        dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
+        }
       }
       dataString += "</ul>";
       return dataString;
