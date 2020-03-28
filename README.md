@@ -34,6 +34,13 @@ decreasing order. Available api endpoints:
   * `region`: comma separated list of regions to return
   * `columns`: comma separated list of columns returned in response, `region`
       is always included as a column.
+* `/api/events`:
+  This endpoint takes the following parameters:
+  * `city`: comma separated list of cities to return
+  * `from`: inclusive date from which records start, format: `YYYY-MM-DD`
+  * `to`: inclusive date to which records span, format: `YYYY-MM-DD`
+      is always included as a column.
+  * `limit`: limit response to latest **n** records.
 
 ## Response schema
 ```yaml

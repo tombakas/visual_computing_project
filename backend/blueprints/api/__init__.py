@@ -50,6 +50,9 @@ def calls_query_builder(params={}, limit=False):
 def events_query_builder(params={}, limit=False):
     conditions = build_conditions(params, "date", "service")
 
+    city = params.get("city")
+    city = "(" + " OR ".join(["city='{}'".format(c) for c in city.split(",")]) + ")"
+
     limit = limit or params.get("limit")
     if limit:
         limit = int(limit)
@@ -57,11 +60,12 @@ def events_query_builder(params={}, limit=False):
     query = """
     SELECT date, name, location, city
     FROM events
-    WHERE {}
+    WHERE {} AND {}
     ORDER BY date(date) DESC
     {}
 
     """.format(
+        city,
         conditions if conditions else "TRUE",
         "LIMIT {}".format(limit) if limit else ""
     )
