@@ -152,13 +152,7 @@ export default {
         .then(result => {
           for (let attr in result.data[0]) {
             if (attr.indexOf("_cat") > -1) {
-              let orignalKey = attr.substring(0, attr.indexOf("_cat"));
-              this.neighborhood.push({
-                type:
-                  this.$store.getters.getCbsKey[orignalKey] + " categorized",
-                key: attr,
-                checked: false
-              });
+              continue;
             } else {
               this.neighborhood.push({
                 type: this.$store.getters.getCbsKey[attr],
