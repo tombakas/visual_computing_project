@@ -130,6 +130,8 @@ export default {
         to: this.timePeriod.to
       };
 
+      this.$store.dispatch('setTimePeriod', this.timePeriod);
+
       if (this.timePeriod.from !== null) {
         params.from = this.timePeriod.from;
       }

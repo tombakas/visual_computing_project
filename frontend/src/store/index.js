@@ -145,8 +145,6 @@ export default new Vuex.Store({
         searchQuery += "&to=" + this.state.timePeriod.to;
       }
 
-      console.log(searchQuery)
-
       axios
         .get("http://localhost:5000/api/events" + searchQuery)
         .then(result => {
