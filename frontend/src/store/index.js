@@ -133,48 +133,28 @@ export default new Vuex.Store({
           console.error(error);
         });
     },
-    getEvents({ commit }, dateTimeRange, city) {
-      // ! DEMO CODE ONLY
-      let demoEvents = [
-        {
-          name: "Soccer match PSV - FC Utrecht",
-          dateTime: "",
-          location: {
-            lat: "51.4417",
-            long: "5.4674"
-          },
-          type: "sports"
-        },
-        {
-          name: "Evoluon Techbeurs",
-          dateTime: "",
-          location: {
-            lat: "51.4435",
-            long: "5.4469"
-          },
-          type: "events"
-        }
-      ];
-      commit("SET_EVENTS", demoEvents);
-
+    getEvents({ commit }) {
       // TODO Set up endpoint on backend
+      let searchQuery = "?city=" + this.state.cities[this.state.city].name;
 
-      // let searchQuery =
-      //   "?from=" +
-      //   dataTimeRange.from +
-      //   "&to=" +
-      //   dateTimeRange.to +
-      //   "&city=" +
-      //   city;
+      if (this.state.timePeriod.from !== "") {
+        searchQuery += "&from=" + this.state.timePeriod.from;
+      }
 
-      // axios
-      //   .get("/api/events/" + searchQuery)
-      //   .then(result => {
-      //     commit("SET_EVENTS", result.data);
-      //   })
-      //   .catch(error => {
-      //     console.error(error);
-      //   });
+      if (this.state.timePeriod.to !== "") {
+        searchQuery += "&to=" + this.state.timePeriod.to;
+      }
+
+      console.log(searchQuery)
+
+      axios
+        .get("http://localhost:5000/api/events" + searchQuery)
+        .then(result => {
+          commit("SET_EVENTS", result.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
     setAttribute({ commit }, attribute) {
       commit("SET_ATTRIBUTE", attribute);

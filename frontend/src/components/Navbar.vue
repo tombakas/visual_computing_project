@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <h1>App name</h1>
+    <h1>Emergenviz</h1>
     <h5>Dispatch calls</h5>
     <div v-for="(value, key) in dispatchType" v-bind:key="'dispatch-' + key" class="dispatch-calls-control">
       <input
@@ -67,7 +67,7 @@
     <label for="limit">{{ limit }} incidents</label>
     <h5>City</h5>
     <select v-model="selectedCity">
-      <option :value="city.name" v-for="(city, index) in getCity" :key="index" >{{city.name}}</option>
+      <option :value="city.name" v-for="(city, index) in getCity" :key="index">{{city.name}}</option>
     </select>
   </nav>
 </template>
@@ -78,7 +78,7 @@ import constants from "../constants.js"
 
 export default {
   computed: {
-    getCity(){
+    getCity() {
       return this.$store.getters.getCities;
     }
   },
@@ -117,8 +117,9 @@ export default {
     };
   },
   watch: {
-    selectedCity(newCity, oldCity){
+    selectedCity(newCity, oldCity) {
       this.$store.dispatch("setCity", newCity);
+      this.$store.dispatch("getEvents");
     }
   },
   methods: {
@@ -143,6 +144,7 @@ export default {
       });
       params.service = type;
       this.$store.dispatch("getCalls", params);
+      this.$store.dispatch("getEvents");
     },
     loadCbsAttributes() {
       axios
@@ -170,7 +172,7 @@ export default {
     },
     setAttribute(attribute) {
       this.$store.dispatch("setAttribute", attribute);
-    },
+    }
   },
   mounted() {
     this.reloadData();
