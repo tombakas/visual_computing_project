@@ -74,6 +74,7 @@
 
 <script>
 import axios from "axios";
+import constants from "../constants.js"
 
 export default {
   computed: {
@@ -86,21 +87,22 @@ export default {
       dispatchType: [
         { type: "police", 
           checked: false, 
-          colors: "#dbe900, #e37500, #b12c00" },
+          colors: constants.POLICE_COLORS.join(",")
+        },
         {
           type: "ambulance",
           checked: false,
-          colors: "#2aff50, #00c1d0, #559dff"
+          colors: constants.AMBULANCE_COLORS.join(",")
         },
         {
           type: "fireBrigade",
           checked: false,
-          colors: "#2e00bf, #8815ff, #ef00ff"
+          colors: constants.FIRE_BRIGADE_COLORS.join(",")
         },
         {
           type: "helicopter",
           checked: false,
-          colors: "#ff8cc6, #ffac81 , #de369d"
+          colors: constants.HELICOPTER_COLORS.join(",")
         }
       ],
       neighborhood: [],

@@ -5,6 +5,7 @@
 <script>
 import eindhovenData from "../assets/EindhovenNeigh.json";
 import utrechtData from "../assets/UtrechtNeigh.json";
+import constants from "../constants.js"
 import axios from "axios";
 
 export default {
@@ -44,19 +45,35 @@ export default {
       let allNewCalls = [
         {
           type: "ambulance",
-          gradient: { 0.4: "#dbe900", 0.65: "#e37500", 1: "#b12c00" }
+          gradient: {
+            0.4: constants.AMBULANCE_COLORS[0],
+            0.65: constants.AMBULANCE_COLORS[1],
+            1: constants.AMBULANCE_COLORS[2]
+          }
         },
         {
           type: "police",
-          gradient: { 0.4: "#2aff50", 0.65: "#00c1d0", 1: "#559dff" }
+          gradient: {
+            0.4: constants.POLICE_COLORS[0],
+            0.65: constants.POLICE_COLORS[1],
+            1: constants.POLICE_COLORS[2]
+          }
         },
         {
           type: "fire-brigade",
-          gradient: { 0.4: "#2e00bf", 0.65: "#8815ff", 1: "#ef00ff" }
+          gradient: {
+            0.4: constants.FIRE_BRIGADE_COLORS[0],
+            0.65: constants.FIRE_BRIGADE_COLORS[1],
+            1: constants.FIRE_BRIGADE_COLORS[2]
+          }
         },
         {
           type: "helicopter",
-          gradient: { 0.4: "#ff8cc6", 0.65: "#ffac81", 1: "#de369d" }
+          gradient: {
+            0.4: constants.HELICOPTER_COLORS[0],
+            0.65: constants.HELICOPTER_COLORS[1],
+            1: constants.HELICOPTER_COLORS[2]
+          }
         }
       ];
       allNewCalls.forEach(call => {
