@@ -12,8 +12,8 @@
       />
       <label
         :for="key"
-        style=" -webkit-background-clip: text"
-      >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
+        style=" -webkit-background-clip: text; margin-left: 10px"
+      >{{  value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
       <div
         class="service-gradient-block"
         :style="{backgroundImage: 'linear-gradient(to right,' + value.colors + ')'}"
@@ -39,6 +39,7 @@
             />
           <label
             :for="key"
+            style="margin: 2px 10px"
             >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
         </div>
     </b-collapse>
