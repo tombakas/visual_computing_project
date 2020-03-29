@@ -5,7 +5,7 @@ FLASK = $(BIN)/flask
 
 .PHONY: api
 api: $(FLASK)
-	FLASK_ENV=dvelopment FLASK_APP=backend $(FLASK) run
+	FLASK_ENV=development FLASK_APP=backend $(FLASK) run
 
 $(FLASK): $(VIRTUALENV)
 	$(PIP) install -r backend/requirements.txt
