@@ -2,7 +2,7 @@
   <nav>
     <h1>App name</h1>
     <h5>Dispatch calls</h5>
-    <div v-for="(value, key) in dispatchType" v-bind:key="'dispatch-' + key">
+    <div v-for="(value, key) in dispatchType" v-bind:key="'dispatch-' + key" class="dispatch-calls-control">
       <input
         type="checkbox"
         :name="value.type"
@@ -12,31 +12,46 @@
       />
       <label
         :for="key"
-        style=" -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+        style=" -webkit-background-clip: text"
+      >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
+      <div
+        class="service-gradient-block"
         :style="{backgroundImage: 'linear-gradient(to right,' + value.colors + ')'}"
-      >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
+        >
+      </div>
     </div>
-    <h5>Neighborhood</h5>
-    <div v-for="(value, key) in neighborhood" v-bind:key="'neighborhood-' + key">
-      <input
-        type="checkbox"
-        :name="value.type"
-        :id="key"
-        v-model="value.checked"
-        v-on:change="setAttribute(value.key)"
-      />
-      <label
-        :for="key"
-      >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
-    </div>
+   
+      <b-button v-b-toggle.neighborhood-collapse @click="neighborhoodCollapsed=!neighborhoodCollapsed" class="neighborhood-toggle">
+        <h5>
+          Neighborhood
+          <span v-if="!neighborhoodCollapsed">⯈</span>
+          <span v-if="neighborhoodCollapsed" >▼</span>
+        </h5>
+      </b-button>
+      <b-collapse id="neighborhood-collapse" >
+        <div v-for="(value, key) in neighborhood" v-bind:key="'neighborhood-' + key">
+          <input
+            type="checkbox"
+            :name="value.type"
+            :id="key"
+            v-model="value.checked"
+            v-on:change="setAttribute(value.key)"
+            />
+          <label
+            :for="key"
+            >{{ value.type.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) }}</label>
+        </div>
+    </b-collapse>
     <h5>Time period</h5>
-    <div>
-      <label for="fromDate">From</label>
-      <input type="date" v-model="timePeriod.from" v-on:change="reloadData()" />
-    </div>
-    <div>
-      <label for="fromDate">To</label>
-      <input type="date" v-model="timePeriod.to" v-on:change="reloadData()" />
+    <div class="time-period-toggle">
+      <div>
+        <label for="fromDate">From</label>
+        <input type="date" v-model="timePeriod.from" v-on:change="reloadData()" />
+      </div>
+      <div>
+        <label for="fromDate">To</label>
+        <input type="date" v-model="timePeriod.to" v-on:change="reloadData()" />
+      </div>
     </div>
     <h5>Number of incidents</h5>
     <input
@@ -69,7 +84,9 @@ export default {
   data() {
     return {
       dispatchType: [
-        { type: "police", checked: false, colors: "#dbe900, #e37500, #b12c00" },
+        { type: "police", 
+          checked: false, 
+          colors: "#dbe900, #e37500, #b12c00" },
         {
           type: "ambulance",
           checked: false,
@@ -93,7 +110,8 @@ export default {
       },
       limit: 100,
       cities: ["Eindhoven", "Utrecht"],
-      selectedCity: "Eindhoven"
+      selectedCity: "Eindhoven",
+      neighborhoodCollapsed: false
     };
   },
   watch: {

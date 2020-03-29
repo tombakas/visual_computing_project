@@ -97,13 +97,13 @@ def cbs_query_builder(params={}):
         quoted_columns,
         region
     )
+
     try:
-        r = query_db(query)
+        return query_db(query)
     except sqlite3.OperationalError as e:
         return jsonify(
             {"Error": str(e)}
         )
-    return r
 
 
 @api.route("/calls/latest/")
