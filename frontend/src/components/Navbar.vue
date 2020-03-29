@@ -24,7 +24,7 @@
       <b-button v-b-toggle.neighborhood-collapse @click="neighborhoodCollapsed=!neighborhoodCollapsed" class="neighborhood-toggle">
         <h5>
           Neighborhood
-          <span v-if="!neighborhoodCollapsed">⯈</span>
+          <span v-if="!neighborhoodCollapsed">></span>
           <span v-if="neighborhoodCollapsed" >▼</span>
         </h5>
       </b-button>
