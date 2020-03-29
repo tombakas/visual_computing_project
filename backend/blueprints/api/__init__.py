@@ -61,6 +61,7 @@ def events_query_builder(params={}, limit=False):
     SELECT date, name, location, city
     FROM events
     WHERE {} AND {}
+    GROUP BY name
     ORDER BY date(date) DESC
     {}
 
