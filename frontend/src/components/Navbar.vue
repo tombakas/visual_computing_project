@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <h1>Emergenviz</h1>
+    <h1>EmergenVis</h1>
     <h5>Dispatch calls</h5>
     <div v-for="(value, key) in dispatchType" v-bind:key="'dispatch-' + key" class="dispatch-calls-control">
       <input

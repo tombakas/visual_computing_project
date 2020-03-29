@@ -242,11 +242,7 @@ export default {
       let dataString = "<ul>";
       for (const prop in data) {
         if (prop.indexOf("_cat") > -1) {
-          dataString += `<li>${
-            this.$store.getters.getCbsKey[
-              prop.substring(0, prop.indexOf("_cat"))
-            ]
-          } categorized: ${data[prop]}</li>`;
+          continue;
         } else {
           dataString += `<li>${this.$store.getters.getCbsKey[prop]}: ${data[prop]}</li>`;
         }
