@@ -14,12 +14,15 @@ export default {
     },
     cbsAttributes() {
       return this.$store.getters.getCbsAttributes;
+    },
+    currentCity() {
+      return this.$store.getters.getCity;
     }
   },
   data() {
     return {
       center: [51.4416, 5.4697],
-      zoom: 13,
+      zoom: 12,
       map: null,
       layers: [],
       titleLayer: null
@@ -31,6 +34,9 @@ export default {
     },
     cbsAttributes(newData, oldData) {
       this.setCbsPopup();
+    },
+    currentCity(newCity, oldCity) {
+      this.panToCity(newCity);
     }
   },
   methods: {
@@ -203,7 +209,7 @@ export default {
       this.layerChanged("UtrechtNeigh", true);
     },
     initMap() {
-      this.map = L.map("map").setView(this.center, this.zoom);
+      this.map = L.map("map").setView(this.$store.getters.getCity.center, this.zoom);
       this.tileLayer = L.tileLayer(
         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png",
         {
@@ -230,6 +236,9 @@ export default {
       }
       dataString += "</ul>";
       return dataString;
+    },
+    panToCity(city){
+      this.map.setView(this.$store.getters.getCity.center, this.zoom);
     }
   },
   mounted() {

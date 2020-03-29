@@ -51,8 +51,8 @@
     />
     <label for="limit">{{ limit }} incidents</label>
     <h5>City</h5>
-    <select name id>
-      <option value="city" v-for="(city, index) in cities" :key="index">{{city}}</option>
+    <select v-model="selectedCity">
+      <option :value="city.name" v-for="(city, index) in getCity" :key="index" >{{city.name}}</option>
     </select>
   </nav>
 </template>
@@ -61,7 +61,11 @@
 import axios from "axios";
 
 export default {
-  computed: {},
+  computed: {
+    getCity(){
+      return this.$store.getters.getCities;
+    }
+  },
   data() {
     return {
       dispatchType: [
@@ -88,8 +92,14 @@ export default {
         to: new Date().toISOString().split("T")[0]
       },
       limit: 100,
-      cities: ["Eindhoven", "Utrecht"]
+      cities: ["Eindhoven", "Utrecht"],
+      selectedCity: "Eindhoven"
     };
+  },
+  watch: {
+    selectedCity(newCity, oldCity){
+      this.$store.dispatch("setCity", newCity);
+    }
   },
   methods: {
     reloadData() {
@@ -139,8 +149,8 @@ export default {
         });
     },
     setAttribute(attribute) {
-      this.$store.dispatch('setAttribute', attribute)
-    }
+      this.$store.dispatch("setAttribute", attribute);
+    },
   },
   mounted() {
     this.reloadData();

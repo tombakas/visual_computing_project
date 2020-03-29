@@ -18,6 +18,17 @@ export default new Vuex.Store({
     dispatchType: {},
     neighborhoodData: {},
     events: [],
+    city: 0,
+    cities: [
+      {
+        name: "Eindhoven",
+        center: [51.4416, 5.4697]
+      },
+      {
+        name: "Utrecht",
+        center: [52.0907, 5.1214]
+      }
+    ],
     cbsAttributes: [],
     cbsDataKey: {
       a_00_14: "Age 0-14",
@@ -80,6 +91,9 @@ export default new Vuex.Store({
     SET_CBS(state, data) {
       state.neighborhoodData = data;
     },
+    SET_CITY(state, city) {
+      state.city = city;
+    },
     SET_ATTRIBUTE(state, attribute) {
       if (state.cbsAttributes.indexOf(attribute) !== -1) {
         state.cbsAttributes = state.cbsAttributes.filter(attr => {
@@ -119,28 +133,6 @@ export default new Vuex.Store({
           console.error(error);
         });
     },
-    // getCbsData({ commit }, params) {
-    //   let requestParams = "?";
-    //   requestParams += "region=" + params.neighborhood;
-    //   if (params.columns !== undefined && params.columns.length > 0) {
-    //     requestParams += "&columns=";
-    //   }
-    //   params.columns.forEach((column, index) => {
-    //     if (index > 0) {
-    //       requestParams += ",";
-    //     }
-    //     requestParams += column;
-    //   });
-
-    //   axios
-    //     .get("http://localhost:5000/api/cbs" + requestParams)
-    //     .then(result => {
-    //       commit("SET_CBS", result.data);
-    //     })
-    //     .catch(error => {
-    //       console.error(error);
-    //     });
-    // },
     getEvents({ commit }, dateTimeRange, city) {
       // ! DEMO CODE ONLY
       let demoEvents = [
@@ -186,9 +178,21 @@ export default new Vuex.Store({
     },
     setAttribute({ commit }, attribute) {
       commit("SET_ATTRIBUTE", attribute);
+    },
+    setCity({ commit }, city) {
+      commit(
+        "SET_CITY",
+        this.state.cities.indexOf(
+          this.state.cities.find(stateCity => {
+            return city === stateCity.name;
+          })
+        )
+      );
     }
   },
   getters: {
+    getCity: state => state.cities[state.city],
+    getCities: state => state.cities,
     getCalls: state => state.calls,
     getEvents: state => state.events,
     getCbs: state => state.neighborhoodData,
