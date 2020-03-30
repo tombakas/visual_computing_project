@@ -1,6 +1,10 @@
 <template>
   <nav>
     <h1>EmergenVis</h1>
+    <div class="navigation-controls">
+      <router-link :to="{name: 'Map'}" tag="button" v-on:click.native="loadCbsAttributes()">Map</router-link>
+      <router-link :to="{name: 'Graphs'}" tag="button" v-on:click.native="loadCbsAttributes()">Graph</router-link>
+    </div>
     <h5>Dispatch calls</h5>
     <div
       v-for="(value, key) in dispatchType"
@@ -158,6 +162,7 @@ export default {
       this.$store.dispatch("getEvents");
     },
     loadCbsAttributes() {
+      this.neighborhood = [];
       axios
         .get("http://localhost:5000/api/cbs?region=Binnenstad")
         .then(result => {
@@ -196,3 +201,11 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.navigation-controls {
+  display: flex;
+  justify-content: space-evenly;
+  margin: -10px 0 20px 0;
+}
+</style>
