@@ -3,7 +3,7 @@
     <h1>EmergenVis</h1>
     <div class="navigation-controls">
       <router-link :to="{name: 'Map'}" tag="button" v-on:click.native="loadCbsAttributes()">Map</router-link>
-      <router-link :to="{name: 'Graphs'}" tag="button" v-on:click.native="loadCbsAttributes()">Graph</router-link>
+      <router-link :to="{name: 'Graphs'}" tag="button" v-on:click.native="loadCbsAttributes()">Graphs</router-link>
     </div>
     <h5>Dispatch calls</h5>
     <div
