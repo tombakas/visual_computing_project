@@ -31,7 +31,9 @@ export default {
   },
   watch: {
     calls(newCalls, oldCalls) {
+      console.log("changing map")
       this.setHeatMap();
+      console.log("done chaningj")
     },
     cbsAttributes(newData, oldData) {
       this.setCbsPopup();

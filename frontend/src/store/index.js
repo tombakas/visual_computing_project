@@ -2,15 +2,18 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    calls: {
+    displayedCalls: {
       data: {
         id: "default"
       }
     },
+    playbackDate: "",
+    allCalls: [],
     timePeriod: {
       from: "",
       to: ""
@@ -76,11 +79,12 @@ export default new Vuex.Store({
       per_uninhab: "Percentage of houses uninhabited",
       pop_den_km2: "Population density per km2 ",
       region: "Neighborhood name"
-    }
+    },
+    abortPlayback: false
   },
   mutations: {
     SET_DATA(state, calls) {
-      state.calls = calls;
+      state.displayedCalls = calls;
     },
     SET_TIME_PERIOD(state, timePeriod) {
       state.timePeriod = timePeriod;
@@ -102,19 +106,20 @@ export default new Vuex.Store({
       } else {
         state.cbsAttributes.push(attribute);
       }
+    },
+    SET_PLAYBACK_DATE(state, date) {
+      state.playbackDate = date;
+    },
+    SET_ALL_CALLS(state, calls) {
+      state.allCalls = calls;
+    },
+    SET_ABORT_PLAYBACK(state, stopPlayback) {
+      state.abortPlayback = stopPlayback;
     }
   },
   actions: {
     setTimePeriod({ commit }, timePeriod) {
       commit("SET_TIME_PERIOD", timePeriod);
-    },
-    getLatest({ commit }) {
-      axios
-        .get("http://localhost:5000/api/calls/?limit=10000")
-        .then(result => {
-          commit("SET_DATA", coordToGeoJson(result.data, "latest"));
-        })
-        .catch(error => {});
     },
     getCalls({ commit }, params) {
       let requestParams = "?";
@@ -132,6 +137,35 @@ export default new Vuex.Store({
         .catch(error => {
           console.error(error);
         });
+    },
+    getPlaybackCalls({ commit, dispatch }, calls) {
+      if (this.state.allCalls.length === 0) {
+        console.log('initilizaing')
+        commit("SET_ALL_CALLS", this.state.displayedCalls);
+        commit("SET_DATA", []);
+      }
+
+      commit("SET_PLAYBACK_DATE", new Date(calls[0].datetime));
+
+      let index = calls.findIndex(
+        call => !datesSameDay(new Date(call.datetime), this.state.playbackDate)
+      );
+      commit("SET_DATA", calls.slice(0, index - 1));
+      console.log(index);
+      console.log(calls.slice(0, index - 1));
+
+      const that = this;
+      setTimeout(function() {
+        if (index !== -1 && !that.state.abortPlayback){
+          dispatch('getPlaybackCalls', calls.slice(index));
+        } else  {
+          console.log("stopping");
+          commit("SET_DATA", that.state.allCalls);
+          commit("SET_ALL_CALLS", []);
+          commit("SET_PLAYBACK_DATE", "");
+          commit("SET_ABORT_PLAYBACK", false);
+        }
+      }, 1500);
     },
     getEvents({ commit }) {
       // TODO Set up endpoint on backend
@@ -166,15 +200,25 @@ export default new Vuex.Store({
           })
         )
       );
+    },
+    setPlayback({ commit }, stopPlayback) {
+      commit("SET_ABORT_PLAYBACK", stopPlayback);
     }
   },
   getters: {
     getCity: state => state.cities[state.city],
     getCities: state => state.cities,
-    getCalls: state => state.calls,
+    getCalls: state => state.displayedCalls,
     getEvents: state => state.events,
     getCbs: state => state.neighborhoodData,
     getCbsKey: state => state.cbsDataKey,
-    getCbsAttributes: state => state.cbsAttributes
+    getCbsAttributes: state => state.cbsAttributes,
+    getPlaybackDate: state => state.playbackDate,
+    getAbortPlayback: state => state.abortPlayback
   }
 });
+
+const datesSameDay = (first, second) =>
+  first.getFullYear() === second.getFullYear() &&
+  first.getMonth() === second.getMonth() &&
+  first.getDate() === second.getDate();
