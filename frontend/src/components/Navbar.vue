@@ -197,7 +197,6 @@ export default {
   mounted() {
     this.reloadData();
     this.loadCbsAttributes();
-    console.log(this.$route.name === "Graphs");
   }
 };
 </script>

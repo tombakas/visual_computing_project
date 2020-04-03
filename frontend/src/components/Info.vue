@@ -12,7 +12,9 @@ export default {
   computed: {
     events() {
       const size = this.$store.getters.getEvents.length;
-      if (size > 10 && size < 16) {
+      if (size === 0) {
+        return [{name: 'No events', location: "this time period"}]
+      } else if (size > 10 && size < 16) {
         return this.$store.getters.getEvents;
       } else {
           const events = this.$store.getters.getEvents.slice(0, 11)

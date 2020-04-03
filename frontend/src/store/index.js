@@ -134,14 +134,10 @@ export default new Vuex.Store({
         });
     },
     getEvents({ commit }) {
-      // TODO Set up endpoint on backend
       let searchQuery = "?city=" + this.state.cities[this.state.city].name;
 
-      if (this.state.timePeriod.from !== "") {
+      if (this.state.timePeriod.from !== null && this.state.timePeriod.to !== null) {
         searchQuery += "&from=" + this.state.timePeriod.from;
-      }
-
-      if (this.state.timePeriod.to !== "") {
         searchQuery += "&to=" + this.state.timePeriod.to;
       }
 
