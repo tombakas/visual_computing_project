@@ -38,7 +38,7 @@
         </svg>
       </div>
       <div class="playback__progress">
-        <div class="playback__progress-inner"></div>
+        <div class="playback__progress-inner" :style="{ left: 'calc(' + (playbackProgress.count - 1) * 100 / playbackProgress.total + '% - 15px)'}"></div>
       </div>
     </div>
   </div>
@@ -48,7 +48,10 @@
 export default {
   computed: {
     playbackRunning() {
-      return this.$store.getters.getPlaybackDate !== "";
+      return this.playbackProgress.date !== undefined;
+    },
+    playbackProgress() {
+      return this.$store.getters.getPlaybackDate;
     }
   },
   methods: {
@@ -112,10 +115,11 @@ export default {
 
     &-inner {
       position: relative;
-      width: 10px;
+      width: 30px;
       height: 100%;
       background-color: map-get($map: $colors, $key: "black");
-      left: -10px;
+      left: -15px;
+      transition-duration: 0.5s;
     }
   }
 }

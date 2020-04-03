@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
 
-
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -12,7 +11,7 @@ export default new Vuex.Store({
         id: "default"
       }
     },
-    playbackDate: "",
+    playbackDate: {},
     allCalls: [],
     timePeriod: {
       from: "",
@@ -140,29 +139,43 @@ export default new Vuex.Store({
     },
     getPlaybackCalls({ commit, dispatch }, calls) {
       if (this.state.allCalls.length === 0) {
-        console.log('initilizaing')
+        let total = 0;
+        let currentDay = new Date(calls[0].datetime);
+        this.state.displayedCalls.forEach(call => {
+          if (!datesSameDay(new Date(call.datetime), currentDay)){
+            total++;
+            currentDay = new Date(call.datetime);
+          }
+        });
         commit("SET_ALL_CALLS", this.state.displayedCalls);
         commit("SET_DATA", []);
+        commit("SET_PLAYBACK_DATE", {
+          date: new Date(calls[0].datetime),
+          count: 0,
+          total: total
+        });
       }
 
-      commit("SET_PLAYBACK_DATE", new Date(calls[0].datetime));
 
+      commit("SET_PLAYBACK_DATE", {
+        date: new Date(calls[0].datetime),
+        count: this.state.playbackDate.count + 1,
+        total: this.state.playbackDate.total
+      });
       let index = calls.findIndex(
-        call => !datesSameDay(new Date(call.datetime), this.state.playbackDate)
+        call => !datesSameDay(new Date(call.datetime), this.state.playbackDate.date)
       );
+
       commit("SET_DATA", calls.slice(0, index - 1));
-      console.log(index);
-      console.log(calls.slice(0, index - 1));
 
       const that = this;
       setTimeout(function() {
-        if (index !== -1 && !that.state.abortPlayback){
-          dispatch('getPlaybackCalls', calls.slice(index));
-        } else  {
-          console.log("stopping");
+        if (index !== -1 && !that.state.abortPlayback) {
+          dispatch("getPlaybackCalls", calls.slice(index));
+        } else {
           commit("SET_DATA", that.state.allCalls);
           commit("SET_ALL_CALLS", []);
-          commit("SET_PLAYBACK_DATE", "");
+          commit("SET_PLAYBACK_DATE", {});
           commit("SET_ABORT_PLAYBACK", false);
         }
       }, 1500);
@@ -220,5 +233,5 @@ export default new Vuex.Store({
 
 const datesSameDay = (first, second) =>
   first.getFullYear() === second.getFullYear() &&
-  first.getMonth() === second.getMonth() &&
-  first.getDate() === second.getDate();
+  first.getMonth() === second.getMonth();
+// first.getDate() === second.getDate();
