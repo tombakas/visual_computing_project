@@ -2,7 +2,7 @@
   <div id="app">
     <navigation></navigation>
     <base-map></base-map>
-    <!-- <time-bar></time-bar> -->
+    <time-bar></time-bar>
     <info></info>
   </div>
 </template>
