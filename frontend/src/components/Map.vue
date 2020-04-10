@@ -48,9 +48,6 @@ export default {
   },
   methods: {
     visualizeCalls(dataChanged) {
-      console.log('disp points', this.displayPoints)
-      console.log(((this.map.getZoom() <= 15 && dataChanged) ||
-        (this.map.getZoom() <= 15 && this.zoom > 15)) && !this.displayPoints)
       if (
         ((this.map.getZoom() <= 15 && dataChanged) ||
         (this.map.getZoom() <= 15 && this.zoom > 15)) && !this.displayPoints
