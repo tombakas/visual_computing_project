@@ -5,7 +5,7 @@
 <script>
 import eindhovenData from "../assets/EindhovenNeigh.json";
 import utrechtData from "../assets/UtrechtNeigh.json";
-import constants from "../constants.js"
+import constants from "../constants.js";
 import axios from "axios";
 
 export default {
@@ -181,18 +181,9 @@ export default {
     },
     initLayers() {
       this.layers.forEach(layer => {
-        const markerFeatures = layer.features.filter(
-          feature => feature.type === "marker"
-        );
         const polygonFeatures = layer.features.filter(
           feature => feature.type === "polygon"
         );
-
-        markerFeatures.forEach(feature => {
-          feature.leafletObject = L.marker(feature.coords).bindPopup(
-            feature.name
-          );
-        });
 
         polygonFeatures.forEach(feature => {
           feature.name = feature.name.replace(/(\,|\')/g, "");
@@ -226,7 +217,10 @@ export default {
       this.layerChanged("UtrechtNeigh", true);
     },
     initMap() {
-      this.map = L.map("map").setView(this.$store.getters.getCity.center, this.zoom);
+      this.map = L.map("map").setView(
+        this.$store.getters.getCity.center,
+        this.zoom
+      );
       this.tileLayer = L.tileLayer(
         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png",
         {
@@ -250,8 +244,8 @@ export default {
       dataString += "</ul>";
       return dataString;
     },
-    panToCity(city){
-      this.map.setView(this.$store.getters.getCity.center, this.zoom);
+    panToCity(city) {
+      this.map.flyTo(this.$store.getters.getCity.center, this.zoom);
     }
   },
   mounted() {

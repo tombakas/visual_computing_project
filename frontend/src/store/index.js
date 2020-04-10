@@ -6,11 +6,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    displayedCalls: {
-      data: {
-        id: "default"
-      }
-    },
+    displayedCalls: [],
     playbackDate: {},
     allCalls: [],
     timePeriod: {
