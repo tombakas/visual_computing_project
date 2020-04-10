@@ -18,6 +18,9 @@ export default {
     },
     currentCity() {
       return this.$store.getters.getCity;
+    },
+    displayPoints() {
+      return this.$store.getters.getPoints;
     }
   },
   data() {
@@ -38,18 +41,25 @@ export default {
     },
     currentCity(newCity, oldCity) {
       this.panToCity(newCity);
+    },
+    displayPoints(newValue, oldValue) {
+      this.visualizeCalls(true);
     }
   },
   methods: {
     visualizeCalls(dataChanged) {
+      console.log('disp points', this.displayPoints)
+      console.log(((this.map.getZoom() <= 15 && dataChanged) ||
+        (this.map.getZoom() <= 15 && this.zoom > 15)) && !this.displayPoints)
       if (
-        (this.map.getZoom() <= 15 && dataChanged) ||
-        (this.map.getZoom() <= 15 && this.zoom > 15)
+        ((this.map.getZoom() <= 15 && dataChanged) ||
+        (this.map.getZoom() <= 15 && this.zoom > 15)) && !this.displayPoints
       ) {
         this.setHeatMap(dataChanged);
       } else if (
         (this.map.getZoom() > 15 && dataChanged) ||
-        (this.map.getZoom() > 15 && this.zoom <= 15)
+        (this.map.getZoom() > 15 && this.zoom <= 15) ||
+        this.displayPoints
       ) {
         this.setCluster(dataChanged);
       }

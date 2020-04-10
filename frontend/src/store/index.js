@@ -14,6 +14,7 @@ export default new Vuex.Store({
       to: ""
     },
     dispatchType: {},
+    displayPoints: false,
     neighborhoodData: {},
     events: [],
     city: 0,
@@ -110,6 +111,9 @@ export default new Vuex.Store({
     },
     SET_ABORT_PLAYBACK(state, stopPlayback) {
       state.abortPlayback = stopPlayback;
+    },
+    SET_DISP_POINTS(state, displayPoints) {
+      state.displayPoints = displayPoints;
     }
   },
   actions: {
@@ -205,6 +209,9 @@ export default new Vuex.Store({
           })
         )
       );
+    }, 
+    setDisplayPoints({ commit }) {
+      commit('SET_DISP_POINTS', !this.state.displayPoints);
     },
     setPlayback({ commit }, stopPlayback) {
       commit("SET_ABORT_PLAYBACK", stopPlayback);
@@ -217,6 +224,8 @@ export default new Vuex.Store({
     getEvents: state => state.events,
     getCbs: state => state.neighborhoodData,
     getCbsKey: state => state.cbsDataKey,
+    getCbsAttributes: state => state.cbsAttributes,
+    getPoints: state => state.displayPoints,
     getCbsAttributes: state => state.cbsAttributes,
     getPlaybackDate: state => state.playbackDate,
     getAbortPlayback: state => state.abortPlayback
