@@ -123,7 +123,7 @@ export default {
         from: null,
         to: new Date().toISOString().split("T")[0]
       },
-      limit: 100,
+      limit: 5000,
       cities: ["Eindhoven", "Utrecht"],
       selectedCity: "Eindhoven",
       neighborhoodCollapsed: false
