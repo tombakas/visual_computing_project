@@ -31,7 +31,7 @@ export default {
   },
   watch: {
     calls(newCalls, oldCalls) {
-      this.setHeatMap();
+      this.visualizeCalls(true);
     },
     cbsAttributes(newData, oldData) {
       this.setCbsPopup();
@@ -41,7 +41,62 @@ export default {
     }
   },
   methods: {
-    setHeatMap() {
+    visualizeCalls(dataChanged) {
+      if (
+        (this.map.getZoom() <= 15 && dataChanged) ||
+        (this.map.getZoom() <= 15 && this.zoom > 15)
+      ) {
+        this.setHeatMap(dataChanged);
+      } else if (
+        (this.map.getZoom() > 15 && dataChanged) ||
+        (this.map.getZoom() > 15 && this.zoom <= 15)
+      ) {
+        this.setCluster(dataChanged);
+      }
+      this.zoom = this.map.getZoom();
+    },
+    setCluster(dataChanged) {
+      let allCallTypes = ["ambulance", "police", "fire-brigade", "helicopter"];
+
+      allCallTypes.forEach(callType => {
+        let layer = this.layers.find(
+          layer => layer.id === "heatmap-" + callType
+        );
+
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+          this.layers.splice(this.layers.indexOf(layer), 1);
+        }
+      });
+
+      if (dataChanged) {
+        let layer = this.layers.find(layer => layer.id === "clustered");
+
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+          this.layers.splice(this.layers.indexOf(layer), 1);
+        }
+      }
+
+      let markers = L.markerClusterGroup();
+      markers.id = "clustered";
+      this.calls.forEach(call => {
+        let marker = L.marker(call.coords, { title: call.service });
+        marker.bindPopup(call.service);
+        markers.addLayer(marker);
+      });
+
+      this.layers.push(markers);
+      markers.addTo(this.map);
+    },
+    setHeatMap(dataChanged) {
+      let layer = this.layers.find(layer => layer.id === "clustered");
+
+      if (layer !== undefined) {
+        layer.removeFrom(this.map);
+        this.layers.splice(this.layers.indexOf(layer), 1);
+      }
+
       let allNewCalls = [
         {
           type: "ambulance",
@@ -81,13 +136,15 @@ export default {
           return callType.service === call.type;
         });
 
-        let layer = this.layers.find(
-          layer => layer.id === "heatmap-" + call.type
-        );
+        if (dataChanged) {
+          let layer = this.layers.find(
+            layer => layer.id === "heatmap-" + call.type
+          );
 
-        if (layer !== undefined) {
-          layer.removeFrom(this.map);
-          this.layers.splice(this.layers.indexOf(layer), 1);
+          if (layer !== undefined) {
+            layer.removeFrom(this.map);
+            this.layers.splice(this.layers.indexOf(layer), 1);
+          }
         }
 
         let incidentCoords = [];
@@ -257,6 +314,11 @@ export default {
     );
     this.initMap();
     this.initLayers();
+
+    let that = this;
+    this.map.on("zoomend", function() {
+      that.visualizeCalls(false);
+    });
   }
 };
 </script>
