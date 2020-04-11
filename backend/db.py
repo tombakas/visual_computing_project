@@ -6,26 +6,30 @@ from datetime import datetime
 from flask import g
 
 
-DATABASE = glob('./db/*.db')[0]
+DATABASE = glob("./db/*.db")[0]
 
 
 def get_db():
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
 
 
 def extract_column_names(query):
-    line = next(
-        filter(
-            lambda a: "SELECT" in a,
-            query.split("\n")
-        ))\
-        .replace("SELECT", "")\
+    line = (
+        next(filter(lambda a: "SELECT" in a, query.split("\n")))
+        .replace("SELECT", "")
         .strip()
-    column_name = [n.strip() for n in line.split(",")]
-    return column_name
+    )
+    column_names = [
+        n.strip() if "as" not in n else n.split("as")[-1].strip()
+        for n in line.split(", ")
+    ]
+
+    column_names = [column_name if "count" not in column_name else "count"
+                    for column_name in column_names]
+    return column_names
 
 
 def build_json_response(db_response, keys):
