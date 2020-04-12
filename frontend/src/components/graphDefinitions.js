@@ -16,8 +16,19 @@ const monthMap = {
   12: "Dec",
 }
 
+const dayMap = {
+  0: "Sun",
+  1: "Mon",
+  2: "Tue",
+  3: "Wed",
+  4: "Thu",
+  5: "Fri",
+  6: "Sat"
+}
+
 let chart = null;
 let color = Chart.helpers.color;
+let innerLabels = [];
 export let prevStack = [];
 
 let chartData = {
@@ -55,6 +66,11 @@ let chartData = {
 
 // -- Functions --
 export let getCounts = function(url, title) {
+  let chartElement = document.getElementById("barChart")
+  let spinner = document.getElementById("spinner")
+
+  chartElement.style.display = "none"
+  spinner.style.display = "block"
   axios
     .get(url)
     .then(result => {
@@ -65,13 +81,30 @@ export let getCounts = function(url, title) {
         chart.destroy()
       }
       create_chart(title)
+      chartElement.style.display = "block"
+      spinner.style.display = "none"
     })
 }
 
 let populate = function(result) {
   for(let entry of result.data) {
-    if (!chartData.labels.includes(entry["date"])) {
-      chartData.labels.push(entry["date"])
+    let label = entry["date"]
+    if (/^[0-9]{4} [0-9]{2}$/.test(label)) {
+      label = monthMap[Number(label.split(" ")[1])]
+    }
+
+    if (/^[0-9]{4} [0-9]{2} [0-9]{2}$/.test(label)) {
+      let day = label.split(" ")[2]
+      label = [day, dayMap[new Date(label).getDay()]]
+    }
+
+    if (/exact$/.test(label)) {
+      label = label.split(" ").slice(0, 3).join(" ")
+    }
+
+    if (!innerLabels.includes(entry["date"])) {
+      innerLabels.push(entry["date"])
+      chartData.labels.push(label)
     }
     switch(entry["service"]) {
       case "police":
@@ -101,6 +134,7 @@ let create_chart = function(title) {
 
 let clearData = function() {
   chartData.labels = []
+  innerLabels = []
   for(let entry of chartData.datasets) {
     entry.data = []
   }
@@ -108,7 +142,14 @@ let clearData = function() {
 }
 
 let goToMap = function(date, vue_instance) {
+  let targetDate = prevStack.pop().split(" ").join("-")
+  let dayLater = new Date(targetDate)
+  dayLater.setDate(dayLater.getDate() + 1)
+  dayLater = dayLater.toJSON().slice(0, 10)
+
   prevStack = []
+  reloadData(10000, {from: targetDate, to: dayLater})
+  window.App.$store.dispatch('setDisplayPoints', true)
   window.App.$router.push({name: "Map"})
 }
 
@@ -148,8 +189,28 @@ let navigateChart = function (query) {
 export let handleGoBack = function() {
   if (prevStack.length > 0) {
     prevStack.pop()
+    if (prevStack.length == 0) {
+      document.getElementById("goBack").style.display = "none"
+    }
     navigateChart(prevStack[prevStack.length - 1])
   }
+}
+
+let reloadData = function(limit, timePeriod) {
+  let params = {
+    limit: limit,
+    to: timePeriod.to
+  };
+
+  window.App.$store.dispatch("setTimePeriod", timePeriod);
+
+  if (timePeriod.from !== null) {
+    params.from = timePeriod.from;
+  }
+
+  params.service = "police,fire-brigade,ambulance,helicopter";
+  window.App.$store.dispatch("getCalls", params);
+  window.App.$store.dispatch("getEvents");
 }
 
 let get_options = function (title_text) {
@@ -162,9 +223,10 @@ let get_options = function (title_text) {
     },
     onClick: function(x) {
       if (chart.getElementAtEvent(x).length) {
-        let clicked = chartData.labels[chart.getElementAtEvent(x)[0]._index]
-        if (chartData.labels.length > 1) {
+        let clicked = innerLabels[chart.getElementAtEvent(x)[0]._index]
+        if (innerLabels.length > 1) {
           prevStack.push(clicked)
+          document.getElementById("goBack").style.display = "block"
           navigateChart(clicked)
         } else {
           goToMap(clicked)

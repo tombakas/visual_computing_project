@@ -64,7 +64,7 @@ def calls_query_builder(params={}, limit=False, count=False):
             conditions = "strftime('%Y %m', datetime) = '{} {}'".format(year, month)
 
         if count_interval == "micro":
-            date_format = format_base.format("%Y %m %d")
+            date_format = format_base.format("%Y %m %d exact")
             year = params.get("year")
             month = params.get("month")
             day = params.get("day")

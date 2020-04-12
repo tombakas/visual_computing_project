@@ -2,8 +2,14 @@
   <nav>
     <h1>EmergenVis</h1>
     <div class="navigation-controls">
-      <router-link :to="{name: 'Map'}" tag="button" v-on:click.native="loadCbsAttributes()">Map</router-link>
-      <router-link :to="{name: 'Graphs'}" tag="button" v-on:click.native="loadCbsAttributes()">Graphs</router-link>
+      <router-link class="mapButton" :to="{name: 'Map'}" v-on:click.native="loadCbsAttributes()">
+        <img src="map.svg" alt=""/>
+        Map
+      </router-link>
+      <router-link class="graphsButton" :to="{name: 'Graphs'}" v-on:click.native="loadCbsAttributes()">
+        <img src="graph.svg" alt=""/>
+        Graphs
+      </router-link>
     </div>
     <h5>Dispatch calls</h5>
     <div
@@ -219,5 +225,27 @@ export default {
   display: flex;
   justify-content: space-evenly;
   margin: -10px 0 20px 0;
+  padding: 20px 0;
 }
+
+.mapButton, .graphsButton {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  color: white;
+  outline: none;
+
+  opacity: 0.7;
+}
+
+.mapButton:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.graphsButton:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
 </style>
