@@ -55,7 +55,7 @@ const router = new VueRouter({
   ]
 });
 
-new Vue({
+window.App = new Vue({
   store,
   router,
   render: h => h(App)

@@ -107,6 +107,10 @@ let clearData = function() {
   if (chart) chart.update();
 }
 
+let goToMap = function(date, vue_instance) {
+  window.App.$router.push({name: "Map"})
+}
+
 let navigateChart = function (query) {
   if (!query) {
     getCounts(
@@ -158,8 +162,12 @@ let get_options = function (title_text) {
     onClick: function(x) {
       if (chart.getElementAtEvent(x).length) {
         let clicked = chartData.labels[chart.getElementAtEvent(x)[0]._index]
-        prevStack.push(clicked)
-        navigateChart(clicked)
+        if (chartData.labels.length > 1) {
+          prevStack.push(clicked)
+          navigateChart(clicked)
+        } else {
+          goToMap(clicked)
+        }
       }
     },
     title: {

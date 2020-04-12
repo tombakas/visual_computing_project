@@ -83,7 +83,6 @@ def calls_query_builder(params={}, limit=False, count=False):
         )
 
     r = query_db(query)
-    print(query)
     return r
 
 

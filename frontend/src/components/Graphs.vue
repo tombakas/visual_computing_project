@@ -15,7 +15,7 @@ import { getCounts, handleGoBack, prevStack} from './graphDefinitions.js'
 
 export default {
   mounted () {
-    getCounts("http://localhost:5000/api/calls/count?interval=year", "Yearly all data point breakdown");
+    getCounts("http://localhost:5000/api/calls/count?interval=year", "Yearly all data point breakdown")
   },
   methods: {
     handleGoBack: () => {
