@@ -108,6 +108,7 @@ let clearData = function() {
 }
 
 let goToMap = function(date, vue_instance) {
+  prevStack = []
   window.App.$router.push({name: "Map"})
 }
 
