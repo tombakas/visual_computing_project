@@ -77,10 +77,17 @@
       step="100"
     />
     <label for="limit">{{ limit }} incidents</label>
-    <h5>City</h5>
+    <h5>Display options</h5>
+    <div>
+    <input type="checkbox" :checked="displayPoints" v-on:click="changeDisplayPoints" id="displayPoints">
+    <label for="displayPoints" style="margin: 10px">Display points only</label>
+    </div>
+    <label style="margin-right: 10px">City</label>
     <select v-model="selectedCity">
       <option :value="city.name" v-for="(city, index) in getCity" :key="index">{{city.name}}</option>
     </select>
+    Displaying points;
+    {{ displayPoints }}
   </nav>
 </template>
 
@@ -92,6 +99,9 @@ export default {
   computed: {
     getCity() {
       return this.$store.getters.getCities;
+    },
+    displayPoints() {
+        return this.$store.getters.getPoints;    
     }
   },
   data() {
@@ -123,7 +133,7 @@ export default {
         from: null,
         to: new Date().toISOString().split("T")[0]
       },
-      limit: 100,
+      limit: 5000,
       cities: ["Eindhoven", "Utrecht"],
       selectedCity: "Eindhoven",
       neighborhoodCollapsed: false
@@ -136,6 +146,9 @@ export default {
     }
   },
   methods: {
+    changeDisplayPoints() {
+      this.$store.dispatch('setDisplayPoints', this.displayPoints);
+    },
     reloadData() {
       let params = {
         limit: this.limit,

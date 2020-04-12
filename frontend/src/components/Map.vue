@@ -5,7 +5,7 @@
 <script>
 import eindhovenData from "../assets/EindhovenNeigh.json";
 import utrechtData from "../assets/UtrechtNeigh.json";
-import constants from "../constants.js"
+import constants from "../constants.js";
 import axios from "axios";
 
 export default {
@@ -18,6 +18,9 @@ export default {
     },
     currentCity() {
       return this.$store.getters.getCity;
+    },
+    displayPoints() {
+      return this.$store.getters.getPoints;
     }
   },
   data() {
@@ -31,17 +34,76 @@ export default {
   },
   watch: {
     calls(newCalls, oldCalls) {
-      this.setHeatMap();
+      this.visualizeCalls(true);
     },
     cbsAttributes(newData, oldData) {
       this.setCbsPopup();
     },
     currentCity(newCity, oldCity) {
       this.panToCity(newCity);
+    },
+    displayPoints(newValue, oldValue) {
+      this.visualizeCalls(true);
     }
   },
   methods: {
-    setHeatMap() {
+    visualizeCalls(dataChanged) {
+      if (
+        ((this.map.getZoom() <= 15 && dataChanged) ||
+        (this.map.getZoom() <= 15 && this.zoom > 15)) && !this.displayPoints
+      ) {
+        this.setHeatMap(dataChanged);
+      } else if (
+        (this.map.getZoom() > 15 && dataChanged) ||
+        (this.map.getZoom() > 15 && this.zoom <= 15) ||
+        this.displayPoints
+      ) {
+        this.setCluster(dataChanged);
+      }
+      this.zoom = this.map.getZoom();
+    },
+    setCluster(dataChanged) {
+      let allCallTypes = ["ambulance", "police", "fire-brigade", "helicopter"];
+
+      allCallTypes.forEach(callType => {
+        let layer = this.layers.find(
+          layer => layer.id === "heatmap-" + callType
+        );
+
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+          this.layers.splice(this.layers.indexOf(layer), 1);
+        }
+      });
+
+      if (dataChanged) {
+        let layer = this.layers.find(layer => layer.id === "clustered");
+
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+          this.layers.splice(this.layers.indexOf(layer), 1);
+        }
+      }
+
+      let markers = L.markerClusterGroup();
+      markers.id = "clustered";
+      this.calls.forEach(call => {
+        let marker = L.marker(call.coords, { title: call.service });
+        marker.bindPopup(call.service);
+        markers.addLayer(marker);
+      });
+
+      this.layers.push(markers);
+      markers.addTo(this.map);
+    },
+    setHeatMap(dataChanged) {
+      let layer = this.layers.find(layer => layer.id === "clustered");
+
+      if (layer !== undefined) {
+        layer.removeFrom(this.map);
+        this.layers.splice(this.layers.indexOf(layer), 1);
+      }
+
       let allNewCalls = [
         {
           type: "ambulance",
@@ -81,13 +143,15 @@ export default {
           return callType.service === call.type;
         });
 
-        let layer = this.layers.find(
-          layer => layer.id === "heatmap-" + call.type
-        );
+        if (dataChanged) {
+          let layer = this.layers.find(
+            layer => layer.id === "heatmap-" + call.type
+          );
 
-        if (layer !== undefined) {
-          layer.removeFrom(this.map);
-          this.layers.splice(this.layers.indexOf(layer), 1);
+          if (layer !== undefined) {
+            layer.removeFrom(this.map);
+            this.layers.splice(this.layers.indexOf(layer), 1);
+          }
         }
 
         let incidentCoords = [];
@@ -181,18 +245,9 @@ export default {
     },
     initLayers() {
       this.layers.forEach(layer => {
-        const markerFeatures = layer.features.filter(
-          feature => feature.type === "marker"
-        );
         const polygonFeatures = layer.features.filter(
           feature => feature.type === "polygon"
         );
-
-        markerFeatures.forEach(feature => {
-          feature.leafletObject = L.marker(feature.coords).bindPopup(
-            feature.name
-          );
-        });
 
         polygonFeatures.forEach(feature => {
           feature.name = feature.name.replace(/(\,|\')/g, "");
@@ -226,7 +281,10 @@ export default {
       this.layerChanged("UtrechtNeigh", true);
     },
     initMap() {
-      this.map = L.map("map").setView(this.$store.getters.getCity.center, this.zoom);
+      this.map = L.map("map").setView(
+        this.$store.getters.getCity.center,
+        this.zoom
+      );
       this.tileLayer = L.tileLayer(
         "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png",
         {
@@ -250,8 +308,8 @@ export default {
       dataString += "</ul>";
       return dataString;
     },
-    panToCity(city){
-      this.map.setView(this.$store.getters.getCity.center, this.zoom);
+    panToCity(city) {
+      this.map.flyTo(this.$store.getters.getCity.center, this.zoom);
     }
   },
   mounted() {
@@ -263,6 +321,11 @@ export default {
     );
     this.initMap();
     this.initLayers();
+
+    let that = this;
+    this.map.on("zoomend", function() {
+      that.visualizeCalls(false);
+    });
   }
 };
 </script>

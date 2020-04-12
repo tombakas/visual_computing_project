@@ -102,7 +102,7 @@ def events_query_builder(params={}, limit=False):
     FROM events
     WHERE {} AND {}
     GROUP BY name
-    ORDER BY date(date) DESC
+    ORDER BY date(date) ASC
     {}
 
     """.format(
