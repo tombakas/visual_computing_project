@@ -1,4 +1,5 @@
 import sqlite3
+import re
 
 from glob import glob
 from datetime import datetime
@@ -17,14 +18,15 @@ def get_db():
 
 
 def extract_column_names(query):
+    query = re.sub("strf.*date", "date", query)
+
     line = (
         next(filter(lambda a: "SELECT" in a, query.split("\n")))
         .replace("SELECT", "")
         .strip()
     )
     column_names = [
-        n.strip() if "as" not in n else n.split("as")[-1].strip()
-        for n in line.split(", ")
+        n.strip() for n in line.split(",")
     ]
 
     column_names = [column_name if "count" not in column_name else "count"
