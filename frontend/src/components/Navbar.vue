@@ -92,8 +92,6 @@
     <select v-model="selectedCity">
       <option :value="city.name" v-for="(city, index) in getCity" :key="index">{{city.name}}</option>
     </select>
-    Displaying points;
-    {{ displayPoints }}
   </nav>
 </template>
 

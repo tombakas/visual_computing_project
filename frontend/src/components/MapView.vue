@@ -1,8 +1,7 @@
 <template>
   <div class="mapview">
-    <!-- <base-map></base-map> -->
     <leaflet-map></leaflet-map>
-    <!-- <time-bar></time-bar> -->
+    <time-bar></time-bar>
     <info></info>
   </div>
 </template>

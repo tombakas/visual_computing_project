@@ -29,7 +29,8 @@ export default {
       zoom: 12,
       map: null,
       layers: [],
-      titleLayer: null
+      titleLayer: null,
+      allCallTypes: ["ambulance", "police", "fire-brigade", "helicopter"]
     };
   },
   watch: {
@@ -50,7 +51,8 @@ export default {
     visualizeCalls(dataChanged) {
       if (
         ((this.map.getZoom() <= 15 && dataChanged) ||
-        (this.map.getZoom() <= 15 && this.zoom > 15)) && !this.displayPoints
+          (this.map.getZoom() <= 15 && this.zoom > 15)) &&
+        !this.displayPoints
       ) {
         this.setHeatMap(dataChanged);
       } else if (
@@ -63,9 +65,7 @@ export default {
       this.zoom = this.map.getZoom();
     },
     setCluster(dataChanged) {
-      let allCallTypes = ["ambulance", "police", "fire-brigade", "helicopter"];
-
-      allCallTypes.forEach(callType => {
+      this.allCallTypes.forEach(callType => {
         let layer = this.layers.find(
           layer => layer.id === "heatmap-" + callType
         );
@@ -309,7 +309,41 @@ export default {
       return dataString;
     },
     panToCity(city) {
+      this.allCallTypes.forEach(callType => {
+        let layer = this.layers.find(
+          layer => layer.id === "heatmap-" + callType
+        );
+        if (layer !== undefined) {
+          layer.removeFrom(this.map);
+        }
+      });
+
+      let layer = this.layers.find(layer => layer.id === "clustered");
+
+      if (layer !== undefined) {
+        layer.removeFrom(this.map);
+      }
+
       this.map.flyTo(this.$store.getters.getCity.center, this.zoom);
+      let that = this;
+      this.map.on("moveend", function() {
+        that.allCallTypes.forEach(callType => {
+          let layer = that.layers.find(
+            layer => layer.id === "heatmap-" + callType
+          );
+
+          if (layer !== undefined) {
+            layer.addTo(that.map);
+          }
+        });
+
+        let layer = that.layers.find(layer => layer.id === "clustered");
+
+        if (layer !== undefined) {
+          layer.removeFrom(that.map);
+        }
+      });
+
     }
   },
   mounted() {
@@ -326,6 +360,10 @@ export default {
     this.map.on("zoomend", function() {
       that.visualizeCalls(false);
     });
+
+    this.map.on("movestart", function() {
+      
+    })
   }
 };
 </script>

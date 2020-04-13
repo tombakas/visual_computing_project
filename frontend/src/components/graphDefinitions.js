@@ -149,7 +149,9 @@ let goToMap = function(date, vue_instance) {
 
   prevStack = []
   reloadData(10000, {from: targetDate, to: dayLater})
-  window.App.$store.dispatch('setDisplayPoints', true)
+  if (!window.App.$store.getters.getPoints) {
+    window.App.$store.dispatch('setDisplayPoints')
+  }
   window.App.$router.push({name: "Map"})
 }
 
