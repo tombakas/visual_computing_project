@@ -8,9 +8,7 @@ import store from "./store";
 // Views
 import MapView from "./components/MapView";
 import Graphs from "./components/Graphs";
-import Bayesian from "./components/BayesianNetwork";
-import Parallel from "./components/ParallelCoordinatePlot";
-import Scatter from "./components/ScatterPlot";
+
 
 Vue.use(BootstrapVue);
 
@@ -34,24 +32,6 @@ const router = new VueRouter({
       component: Graphs,
       props: false
     },
-    {
-      path: "/graphs/bayesian",
-      name: "bayesian",
-      component: Bayesian,
-      props: false
-    },
-    {
-      path: "/graphs/parallel",
-      name: "bayesian",
-      component: Parallel,
-      props: false
-    },
-    {
-      path: "/graphs/scatter",
-      name: "bayesian",
-      component: Scatter,
-      props: false
-    }
   ]
 });
 
