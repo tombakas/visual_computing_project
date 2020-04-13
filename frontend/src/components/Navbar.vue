@@ -147,7 +147,7 @@ export default {
       neighborhood: [],
       timePeriod: {
         from: null,
-        to: new Date().toISOString().split("T")[0]
+        to: null,
       },
       limit: 5000,
       cities: ["Eindhoven", "Utrecht"],
@@ -200,6 +200,7 @@ export default {
       axios
         .get("http://localhost:5000/api/cbs?region=Binnenstad")
         .then(result => {
+          console.log(result);
           for (let attr in result.data[0]) {
             if (attr.indexOf("_cat") > -1) {
               if (this.$route.name === "Graphs") {
