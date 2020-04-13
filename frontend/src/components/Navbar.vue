@@ -3,11 +3,15 @@
     <h1>EmergenVis</h1>
     <div class="navigation-controls">
       <router-link class="mapButton" :to="{name: 'Map'}" v-on:click.native="loadCbsAttributes()">
-        <img src="map.svg" alt=""/>
+        <img src="map.svg" alt />
         Map
       </router-link>
-      <router-link class="graphsButton" :to="{name: 'Graphs'}" v-on:click.native="loadCbsAttributes()">
-        <img src="graph.svg" alt=""/>
+      <router-link
+        class="graphsButton"
+        :to="{name: 'Graphs'}"
+        v-on:click.native="loadCbsAttributes()"
+      >
+        <img src="graph.svg" alt />
         Graphs
       </router-link>
     </div>
@@ -85,8 +89,13 @@
     <label for="limit">{{ limit }} incidents</label>
     <h5>Display options</h5>
     <div>
-    <input type="checkbox" :checked="displayPoints" v-on:click="changeDisplayPoints" id="displayPoints">
-    <label for="displayPoints" style="margin: 10px">Display points only</label>
+      <input
+        type="checkbox"
+        :checked="displayPoints"
+        v-on:click="changeDisplayPoints"
+        id="displayPoints"
+      />
+      <label for="displayPoints" style="margin: 10px">Display points only</label>
     </div>
     <label style="margin-right: 10px">City</label>
     <select v-model="selectedCity">
@@ -105,7 +114,10 @@ export default {
       return this.$store.getters.getCities;
     },
     displayPoints() {
-        return this.$store.getters.getPoints;    
+      return this.$store.getters.getPoints;
+    },
+    getTimePeriod() {
+      return this.$store.getters.getTimePeriod;
     }
   },
   data() {
@@ -147,11 +159,16 @@ export default {
     selectedCity(newCity, oldCity) {
       this.$store.dispatch("setCity", newCity);
       this.$store.dispatch("getEvents");
+    },
+    getTimePeriod(oldTime, newTime) {
+      console.log('new time: ', newTime);
+      this.timePeriod.from = newTime.from;
+      this.timePeriod.to = newTime.to;
     }
   },
   methods: {
     changeDisplayPoints() {
-      this.$store.dispatch('setDisplayPoints', this.displayPoints);
+      this.$store.dispatch("setDisplayPoints", this.displayPoints);
     },
     reloadData() {
       let params = {
@@ -226,7 +243,8 @@ export default {
   padding: 20px 0;
 }
 
-.mapButton, .graphsButton {
+.mapButton,
+.graphsButton {
   width: 50px;
   height: 50px;
   text-align: center;
@@ -245,5 +263,4 @@ export default {
   opacity: 1;
   text-decoration: none;
 }
-
 </style>

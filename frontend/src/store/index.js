@@ -11,7 +11,7 @@ export default new Vuex.Store({
     allCalls: [],
     timePeriod: {
       from: "",
-      to: ""
+      to: new Date().toISOString().split("T")[0]
     },
     dispatchType: {},
     displayPoints: false,
@@ -228,7 +228,8 @@ export default new Vuex.Store({
     getPoints: state => state.displayPoints,
     getCbsAttributes: state => state.cbsAttributes,
     getPlaybackDate: state => state.playbackDate,
-    getAbortPlayback: state => state.abortPlayback
+    getAbortPlayback: state => state.abortPlayback,
+    getTimePeriod: state => state.timePeriod
   }
 });
 
