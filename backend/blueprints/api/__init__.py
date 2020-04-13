@@ -25,24 +25,63 @@ def close_connection(exception):
         db.close()
 
 
-def calls_query_builder(params={}, limit=False):
+def calls_query_builder(params={}, limit=False, count=False):
     conditions = build_conditions(params, column_param="service")
 
-    limit = limit or params.get("limit")
-    if limit:
-        limit = int(limit)
+    if not count:
+        limit = limit or params.get("limit")
+        if limit:
+            limit = int(limit)
 
-    query = """
-    SELECT service, datetime, urgency, lat, lon
-    FROM calls
-    WHERE lat IS NOT NULL AND {}
-    ORDER BY date(datetime) DESC
-    {}
+        query = """
+        SELECT service, datetime, urgency, lat, lon
+        FROM calls
+        WHERE lat IS NOT NULL AND {}
+        ORDER BY date(datetime) DESC
+        {}
 
-    """.format(
-        conditions if conditions else "TRUE",
-        "LIMIT {}".format(limit) if limit else ""
-    )
+        """.format(
+            conditions if conditions else "TRUE",
+            "LIMIT {}".format(limit) if limit else ""
+        )
+    else:
+        limit = None
+        format_base = "strftime('{}',datetime)"
+        count_interval = params["interval"]
+
+        if count_interval == "year":
+            date_format = format_base.format("%Y")
+
+        if count_interval == "month":
+            date_format = format_base.format("%Y %m")
+            year = params.get("year")
+            conditions = "strftime('%Y', datetime) = '{}'".format(year)
+
+        if count_interval == "day":
+            date_format = format_base.format("%Y %m %d")
+            year = params.get("year")
+            month = params.get("month")
+            conditions = "strftime('%Y %m', datetime) = '{} {}'".format(year, month)
+
+        if count_interval == "micro":
+            date_format = format_base.format("%Y %m %d exact")
+            year = params.get("year")
+            month = params.get("month")
+            day = params.get("day")
+            conditions = "strftime('%Y %m %d', datetime) = '{} {} {}'".format(year, month, day)
+
+        query = """
+        SELECT {} service, count(service)
+        FROM calls
+        WHERE {}
+        GROUP BY {} service
+
+        """.format(
+            "{} as date,".format(date_format) if date_format else "",
+            conditions if conditions else "TRUE",
+            "{},".format(date_format) or ""
+        )
+
     r = query_db(query)
     return r
 
@@ -117,6 +156,18 @@ def calls():
     params = request.args
     try:
         r = calls_query_builder(params)
+    except sqlite3.OperationalError as e:
+        return jsonify(
+            {"Error": str(e)}
+        )
+    return jsonify(r)
+
+
+@api.route("/calls/count")
+def calls_count():
+    params = request.args
+    try:
+        r = calls_query_builder(params, count=True)
     except sqlite3.OperationalError as e:
         return jsonify(
             {"Error": str(e)}

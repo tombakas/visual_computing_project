@@ -1,24 +1,16 @@
 <template>
   <div id="app">
     <navigation></navigation>
-    <base-map></base-map>
-    <time-bar></time-bar>
-    <info></info>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Info from "./components/Info";
-import BaseMap from "./components/Map";
-import TimeBar from "./components/TimeBar";
 import Navigation from "./components/Navbar";
 
 export default {
   name: "App",
   components: {
-    Info,
-    BaseMap,
-    TimeBar,
     Navigation
   }
 };
