@@ -1,4 +1,5 @@
 import sqlite3
+import re
 
 from glob import glob
 from datetime import datetime
@@ -6,26 +7,31 @@ from datetime import datetime
 from flask import g
 
 
-DATABASE = glob('./db/*.db')[0]
+DATABASE = glob("./db/*.db")[0]
 
 
 def get_db():
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
 
 
 def extract_column_names(query):
-    line = next(
-        filter(
-            lambda a: "SELECT" in a,
-            query.split("\n")
-        ))\
-        .replace("SELECT", "")\
+    query = re.sub("strf.*date", "date", query)
+
+    line = (
+        next(filter(lambda a: "SELECT" in a, query.split("\n")))
+        .replace("SELECT", "")
         .strip()
-    column_name = [n.strip() for n in line.split(",")]
-    return column_name
+    )
+    column_names = [
+        n.strip() for n in line.split(",")
+    ]
+
+    column_names = [column_name if "count" not in column_name else "count"
+                    for column_name in column_names]
+    return column_names
 
 
 def build_json_response(db_response, keys):
@@ -45,9 +51,11 @@ def build_json_response(db_response, keys):
     return json_response
 
 
-def query_db(query, args=()):
+def query_db(query, args=(), json_response=True):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
+    if not json_response:
+        return rv
     cur.close()
     keys = extract_column_names(query)
     return build_json_response(rv, keys)
