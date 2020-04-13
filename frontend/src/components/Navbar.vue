@@ -147,7 +147,7 @@ export default {
       neighborhood: [],
       timePeriod: {
         from: null,
-        to: null,
+        to: new Date().toISOString().split("T")[0],
       },
       limit: 5000,
       cities: ["Eindhoven", "Utrecht"],
@@ -160,7 +160,7 @@ export default {
       this.$store.dispatch("setCity", newCity);
       this.$store.dispatch("getEvents");
     },
-    getTimePeriod(oldTime, newTime) {
+    getTimePeriod(newTime, oldTime) {
       this.timePeriod.from = newTime.from;
       this.timePeriod.to = newTime.to;
     }
