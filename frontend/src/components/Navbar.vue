@@ -161,7 +161,6 @@ export default {
       this.$store.dispatch("getEvents");
     },
     getTimePeriod(oldTime, newTime) {
-      console.log('new time: ', newTime);
       this.timePeriod.from = newTime.from;
       this.timePeriod.to = newTime.to;
     }
@@ -200,7 +199,6 @@ export default {
       axios
         .get("http://localhost:5000/api/cbs?region=Binnenstad")
         .then(result => {
-          console.log(result);
           for (let attr in result.data[0]) {
             if (attr.indexOf("_cat") > -1) {
               if (this.$route.name === "Graphs") {
