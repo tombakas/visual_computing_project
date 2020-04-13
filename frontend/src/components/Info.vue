@@ -39,7 +39,6 @@ export default {
   background: map-get($map: $colors, $key: "primary");
   top: 5px;
   right: 5px;
-  // height: 80px;
   max-width: calc(30% - 40px);
   color: map-get($map: $colors, $key: "white");
   padding: 10px 20px;
