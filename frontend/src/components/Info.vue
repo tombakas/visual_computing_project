@@ -17,12 +17,7 @@ export default {
       } else if (size > 10 && size < 16) {
         return this.$store.getters.getEvents;
       } else {
-          const events = this.$store.getters.getEvents.slice(0, 10)
-          events.push({
-              name: 'And many more',
-              location: 'this time period'
-          })
-        return events;
+        return this.$store.getters.getEvents.slice(0, 10);
       }
     }
   },
